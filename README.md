@@ -6,8 +6,8 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 This repo is configured for GitHub Pages **sub-path** deployment.
 
-- **Site URL**: `https://ustbmz.github.io/mBrigheDemo/`
-- **Vite base**: `vite.config.js` uses `base: '/mBrigheDemo/'`
+- **Site URL**: `https://ustbmz.github.io/mbrigedemo/`
+- **Vite base**: `vite.config.js` uses `base: '/mbrigedemo/'`
 - **Auto deploy**: push to `main` triggers `.github/workflows/deploy-pages.yml`
 
 Currently, two official plugins are available:
