@@ -76,7 +76,7 @@
 
 .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
 .header p { margin-top: 6px; color: #6a7ea8; }
-.badge { padding: 10px 16px; border-radius: 999px; color: #1458c8; font-weight: 600; background: #e8f1ff; }
+.badge { padding: 10px 16px;  color: #19396d; font-weight: 600; }
 
 .workspace {
   margin-top: 20px;

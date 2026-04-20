@@ -367,7 +367,7 @@ function App() {
       <header className="header">
         <div>
           <h1>数字人民币 mBridge 跨境支付</h1>
-          <p>银行正式蓝色风格 Demo - 全套交易页面</p>
+          {/* <p>银行正式蓝色风格 Demo - 全套交易页面</p> */}
         </div>
         <div className="badge">进度 {progress}%</div>
       </header>
