@@ -325,6 +325,7 @@ function App() {
 
   const canPrev = flowStep > 0
   const canNext = flowStep < FLOW_STEPS.length - 1
+  const lockPreviousSteps = flowStep >= 7 && flowStep <= 10
 
   if (view === 'login') {
     return (
@@ -376,8 +377,18 @@ function App() {
         <aside className="stepper">
           {FLOW_STEPS.map((step, index) => {
             const state = index < flowStep ? 'done' : index === flowStep ? 'active' : 'todo'
+            const disableJumpBack = lockPreviousSteps && index < flowStep
             return (
-              <button key={step} type="button" className={`step-item ${state}`} onClick={() => setFlowStep(index)}>
+              <button
+                key={step}
+                type="button"
+                className={`step-item ${state}`}
+                disabled={disableJumpBack}
+                onClick={() => {
+                  if (disableJumpBack) return
+                  setFlowStep(index)
+                }}
+              >
                 <span>{index + 1}</span>
                 <em>{step}</em>
               </button>

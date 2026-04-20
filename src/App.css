@@ -74,7 +74,14 @@
 }
 .login-btn { width: 100%; margin-top: 8px; }
 
-.header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dfe9fa;
+}
 .header p { margin-top: 6px; color: #6a7ea8; }
 .badge { padding: 10px 16px;  color: #19396d; font-weight: 600; }
 
