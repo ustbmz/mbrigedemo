@@ -214,7 +214,7 @@ function App() {
     () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
     [flowStep],
   )
-  const channelOptions = ['mBrige', 'Swift', 'Cift']
+  const channelOptions = ['MBRIGE', 'SWIFT', 'CIPS']
   const fxRateNumber = liveFxRate
   const fixedPayAmountRmb = Number(tradeData.payAmount.replaceAll(',', ''))
   const requiredReceiveAmount = fixedPayAmountRmb * fxRateNumber
