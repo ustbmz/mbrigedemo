@@ -208,6 +208,7 @@ function App() {
   const [liveFxRate, setLiveFxRate] = useState(4.5)
   const [fxDate, setFxDate] = useState('')
   const [fxError, setFxError] = useState('')
+  const [theme, setTheme] = useState('default')
 
   const progress = useMemo(
     () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
@@ -477,20 +478,45 @@ function App() {
 
   if (view === 'home') {
     return (
-      <main className="app">
+      <main className={`app theme-${theme}`}>
         <HomeDashboard onStartMBrige={() => { setFlowStep(0); setView('flow') }} />
       </main>
     )
   }
 
   return (
-    <main className="app">
+    <main className={`app theme-${theme}`}>
       <header className="header">
         <div>
-          <h1>数字人民币 mBrige 跨境支付</h1>
+          <h1>国际货币贸易结算交易</h1>
           {/* <p>银行正式蓝色风格 Demo - 全套交易页面</p> */}
         </div>
-        <div className="badge">进度 {progress}%</div>
+        <div className="header-actions">
+          <div className="theme-switch" role="group" aria-label="页面风格切换">
+            <button
+              type="button"
+              className={`theme-dot theme-dot-default ${theme === 'default' ? 'active' : ''}`}
+              onClick={() => setTheme('default')}
+              aria-label="默认蓝风格"
+              title="默认蓝"
+            />
+            <button
+              type="button"
+              className={`theme-dot theme-dot-dark ${theme === 'dark' ? 'active' : ''}`}
+              onClick={() => setTheme('dark')}
+              aria-label="深色夜间风格"
+              title="深色夜间"
+            />
+            <button
+              type="button"
+              className={`theme-dot theme-dot-green ${theme === 'green' ? 'active' : ''}`}
+              onClick={() => setTheme('green')}
+              aria-label="墨绿商务风格"
+              title="墨绿商务"
+            />
+          </div>
+          <div className="badge">进度 {progress}%</div>
+        </div>
       </header>
 
       <div className="workspace">
