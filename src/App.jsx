@@ -203,11 +203,11 @@ function App() {
   const [loadingPhase, setLoadingPhase] = useState('')
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [selectedChannel, setSelectedChannel] = useState('mBrige')
-  const [receiveAmountInput, setReceiveAmountInput] = useState('45,000.00')
+  const [receiveAmountInput, setReceiveAmountInput] = useState('')
+  const [receiveAmountTouched, setReceiveAmountTouched] = useState(false)
   const [liveFxRate, setLiveFxRate] = useState(4.5)
   const [fxDate, setFxDate] = useState('')
   const [fxError, setFxError] = useState('')
-  const [isRefreshingFx, setIsRefreshingFx] = useState(false)
 
   const progress = useMemo(
     () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
@@ -230,6 +230,7 @@ function App() {
     }
     return ''
   }, [fixedPayAmountRmb, receiveAmountNumber, requiredReceiveAmount, sanitizedReceiveAmount])
+  const displayReceiveAmountError = receiveAmountTouched ? receiveAmountError : ''
   const isReceiveAmountValid = !receiveAmountError
   const canDerivePayAmount = !Number.isNaN(receiveAmountNumber) && receiveAmountNumber > 0
   const formattedReceiveAmount = canDerivePayAmount
@@ -239,6 +240,7 @@ function App() {
   const fxRateDisplay = `1 ${tradeData.payCurrency} = ${fxRateNumber.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${tradeData.receiveCurrency}`
 
   const formatReceiveAmountInput = () => {
+    setReceiveAmountTouched(true)
     const sanitized = receiveAmountInput.replaceAll(',', '').trim()
     const amountNumber = Number(sanitized)
     if (!sanitized || Number.isNaN(amountNumber) || amountNumber <= 0) return
@@ -247,7 +249,6 @@ function App() {
 
   const loadFxRate = useCallback(async () => {
     try {
-      setIsRefreshingFx(true)
       setFxError('')
       let nextRate = 0
       let nextDate = ''
@@ -275,8 +276,6 @@ function App() {
       setFxDate(nextDate)
     } catch (error) {
       setFxError('实时汇率获取失败，已使用默认汇率（4.5）')
-    } finally {
-      setIsRefreshingFx(false)
     }
   }, [])
 
@@ -370,17 +369,20 @@ function App() {
           value: (
             <div className="amount-field-wrap">
               <input
-                className={`amount-input ${receiveAmountError ? 'invalid' : ''}`}
+                className={`amount-input ${displayReceiveAmountError ? 'invalid' : ''}`}
                 value={receiveAmountInput}
-                onChange={(event) => setReceiveAmountInput(event.target.value)}
+                onChange={(event) => {
+                  setReceiveAmountTouched(true)
+                  setReceiveAmountInput(event.target.value)
+                }}
                 onBlur={formatReceiveAmountInput}
                 placeholder={`请输入 ${tradeData.receiveCurrency} 金额`}
               />
               <span className="amount-currency">{tradeData.receiveCurrency}</span>
-              {receiveAmountError ? (
+              {displayReceiveAmountError ? (
                 <small className="amount-inline-text error-text">
                   <span className="tip-icon" aria-hidden="true">!</span>
-                  {receiveAmountError}
+                  {displayReceiveAmountError}
                 </small>
               ) : null}
             </div>
@@ -394,15 +396,6 @@ function App() {
         按 {tradeData.receiveCurrency} 录入，系统将自动折算 {tradeData.payCurrency}。当前规则：收款金额需为{' '}
         {requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {tradeData.receiveCurrency}
         （对应 {formattedPayAmount} {tradeData.payCurrency}）。
-      </div>
-      <div className="page-tip rate-tip">
-        <div className="rate-tip-row">
-          <span>当前汇率：{fxRateDisplay}{fxDate ? `（日期：${fxDate}）` : ''}</span>
-          <button type="button" className="btn secondary rate-refresh-btn" onClick={loadFxRate} disabled={isRefreshingFx}>
-            {isRefreshingFx ? '刷新中...' : '刷新汇率'}
-          </button>
-        </div>
-        {fxError ? <div className="rate-error">{fxError}</div> : null}
       </div>
     </SectionCard>,
     <SectionCard title="贸易背景与单据上传">
@@ -525,7 +518,10 @@ function App() {
         <section className="panel">
           <div className="panel-title">
             <h2>{FLOW_STEPS[flowStep]}</h2>
-            <small>步骤 {flowStep + 1} / {FLOW_STEPS.length}</small>
+            <small>
+              汇率：{fxRateDisplay}{fxDate ? `（${fxDate}）` : ''}
+              {fxError ? '（默认）' : ''}
+            </small>
           </div>
           <div className="step-page" data-step={flowStep + 1}>
             <div className="step-page-header">
