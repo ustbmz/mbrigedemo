@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const FLOW_STEPS = [
   '通道选择',
-  '付款信息',
-  '收款信息',
-  '贸易背景',
-  '单据上传',
+  '付款与收款信息',
+  '贸易背景与单据上传',
   '自动校验',
   '转账确认',
   '处理中',
@@ -33,7 +31,7 @@ const LOADING_TASKS = {
   checking: [
     '校验付款主体与账户权限',
     '核验收款方信息一致性',
-    '比对合同与发票金额',
+    '按收款金额执行汇率折算与单据金额比对',
     '执行反洗钱与制裁筛查',
     '生成自动校验报告',
   ],
@@ -72,9 +70,7 @@ function UploadList() {
   return (
     <div className="upload-list">
       <div className="upload-dropzone">
-        <div className="upload-icon">↑</div>
-        <p>将文件拖拽到此处，或点击上传</p>
-        <small>支持 PDF/JPG/PNG，单文件不超过 20MB（演示界面）</small>
+        <p>支持 PDF/JPG/PNG，单文件不超过 20MB</p>
         <button type="button" className="btn secondary upload-trigger">
           选择文件
         </button>
@@ -206,11 +202,87 @@ function App() {
   const [flowStep, setFlowStep] = useState(0)
   const [loadingPhase, setLoadingPhase] = useState('')
   const [loadingProgress, setLoadingProgress] = useState(0)
+  const [selectedChannel, setSelectedChannel] = useState('mBrige')
+  const [receiveAmountInput, setReceiveAmountInput] = useState('45,000.00')
+  const [liveFxRate, setLiveFxRate] = useState(4.5)
+  const [fxDate, setFxDate] = useState('')
+  const [fxError, setFxError] = useState('')
+  const [isRefreshingFx, setIsRefreshingFx] = useState(false)
 
   const progress = useMemo(
     () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
     [flowStep],
   )
+  const channelOptions = ['mBrige', 'Swift', 'Cift']
+  const fxRateNumber = liveFxRate
+  const fixedPayAmountRmb = Number(tradeData.payAmount.replaceAll(',', ''))
+  const requiredReceiveAmount = fixedPayAmountRmb * fxRateNumber
+  const sanitizedReceiveAmount = receiveAmountInput.replaceAll(',', '').trim()
+  const receiveAmountNumber = Number(sanitizedReceiveAmount)
+  const receiveAmountPattern = /^\d+(\.\d{1,2})?$/
+  const receiveAmountError = useMemo(() => {
+    if (!sanitizedReceiveAmount) return `请输入收款金额（${tradeData.receiveCurrency}）`
+    if (!receiveAmountPattern.test(sanitizedReceiveAmount)) return '金额格式有误，请输入数字且最多保留 2 位小数'
+    if (Number.isNaN(receiveAmountNumber)) return '收款金额无法识别，请重新输入'
+    if (receiveAmountNumber <= 0) return '收款金额需大于 0'
+    if (Math.abs(receiveAmountNumber - requiredReceiveAmount) > 0.0001) {
+      return `金额校验未通过：收款金额应为 ${requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tradeData.receiveCurrency}（按当前汇率对应固定付款金额 ${fixedPayAmountRmb.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tradeData.payCurrency}）`
+    }
+    return ''
+  }, [fixedPayAmountRmb, receiveAmountNumber, requiredReceiveAmount, sanitizedReceiveAmount])
+  const isReceiveAmountValid = !receiveAmountError
+  const canDerivePayAmount = !Number.isNaN(receiveAmountNumber) && receiveAmountNumber > 0
+  const formattedReceiveAmount = canDerivePayAmount
+    ? receiveAmountNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : receiveAmountInput || '-'
+  const formattedPayAmount = fixedPayAmountRmb.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const fxRateDisplay = `1 ${tradeData.payCurrency} = ${fxRateNumber.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${tradeData.receiveCurrency}`
+
+  const formatReceiveAmountInput = () => {
+    const sanitized = receiveAmountInput.replaceAll(',', '').trim()
+    const amountNumber = Number(sanitized)
+    if (!sanitized || Number.isNaN(amountNumber) || amountNumber <= 0) return
+    setReceiveAmountInput(amountNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+  }
+
+  const loadFxRate = useCallback(async () => {
+    try {
+      setIsRefreshingFx(true)
+      setFxError('')
+      let nextRate = 0
+      let nextDate = ''
+
+      try {
+        const primaryResponse = await fetch('https://api.frankfurter.app/latest?from=CNY&to=THB')
+        if (!primaryResponse.ok) throw new Error('primary failed')
+        const primaryData = await primaryResponse.json()
+        nextRate = Number(primaryData?.rates?.THB)
+        nextDate = primaryData?.date || ''
+        if (!Number.isFinite(nextRate) || nextRate <= 0) throw new Error('primary invalid')
+      } catch {
+        const backupResponse = await fetch('https://open.er-api.com/v6/latest/CNY')
+        if (!backupResponse.ok) throw new Error('backup failed')
+        const backupData = await backupResponse.json()
+        nextRate = Number(backupData?.rates?.THB)
+        const unixTime = Number(backupData?.time_last_update_unix)
+        nextDate = Number.isFinite(unixTime) && unixTime > 0
+          ? new Date(unixTime * 1000).toISOString().slice(0, 10)
+          : ''
+        if (!Number.isFinite(nextRate) || nextRate <= 0) throw new Error('backup invalid')
+      }
+
+      setLiveFxRate(nextRate)
+      setFxDate(nextDate)
+    } catch (error) {
+      setFxError('实时汇率获取失败，已使用默认汇率（4.5）')
+    } finally {
+      setIsRefreshingFx(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadFxRate()
+  }, [loadFxRate])
 
   useEffect(() => {
     if (view !== 'flow') {
@@ -220,7 +292,7 @@ function App() {
     }
     let finishTimer
     let intervalTimer
-    if (flowStep === 5) {
+    if (flowStep === 3) {
       setLoadingPhase('checking')
       setLoadingProgress(0)
       intervalTimer = window.setInterval(() => {
@@ -230,9 +302,9 @@ function App() {
         window.clearInterval(intervalTimer)
         setLoadingPhase('')
         setLoadingProgress(0)
-        setFlowStep(6)
+        setFlowStep(4)
       }, 5000)
-    } else if (flowStep === 7) {
+    } else if (flowStep === 5) {
       setLoadingPhase('processing')
       setLoadingProgress(0)
       intervalTimer = window.setInterval(() => {
@@ -242,7 +314,7 @@ function App() {
         window.clearInterval(intervalTimer)
         setLoadingPhase('')
         setLoadingProgress(0)
-        setFlowStep(8)
+        setFlowStep(6)
       }, 5000)
     } else {
       setLoadingPhase('')
@@ -256,43 +328,98 @@ function App() {
 
   const stepContent = [
     <SectionCard title="通道选择">
-      <KvGrid items={[
-        { label: '通道', value: 'mBrige 多边央行数字货币桥' },
-        { label: '路由策略', value: '优先最优汇率 + 实时到账' },
-        { label: '预计时效', value: 'T+0，约 30 秒内' },
-        { label: '网络状态', value: '可用' },
-      ]} />
+      <div className="kv-grid">
+        <div className="kv-item">
+          <span className="label">通道选择</span>
+          <div>
+            <select
+              className="channel-select"
+              value={selectedChannel}
+              onChange={(event) => setSelectedChannel(event.target.value)}
+            >
+              {channelOptions.map((channel) => (
+                <option key={channel} value={channel}>
+                  {channel}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="kv-item">
+          <span className="label">已选通道</span>
+          <strong>{selectedChannel || '未选择'}</strong>
+        </div>
+        <div className="kv-item">
+          <span className="label">路由策略</span>
+          <strong>优先最优汇率 + 实时到账</strong>
+        </div>
+        <div className="kv-item">
+          <span className="label">预计时效</span>
+          <strong>T+0，约 30 秒内</strong>
+        </div>
+      </div>
     </SectionCard>,
-    <SectionCard title="付款信息填写">
+    <SectionCard title="付款与收款信息填写">
       <KvGrid items={[
         { label: '付款企业', value: tradeData.payerCompany },
         { label: '付款银行', value: tradeData.payerBank },
-        { label: '付款金额', value: `${tradeData.payAmount} ${tradeData.payCurrency}` },
         { label: '付款账户', value: '1045 0001 8823 5600 22' },
-      ]} />
-    </SectionCard>,
-    <SectionCard title="收款信息填写">
-      <KvGrid items={[
         { label: '收款企业', value: tradeData.receiverCompany },
+        {
+          label: '输入金额（收款币种）',
+          value: (
+            <div className="amount-field-wrap">
+              <input
+                className={`amount-input ${receiveAmountError ? 'invalid' : ''}`}
+                value={receiveAmountInput}
+                onChange={(event) => setReceiveAmountInput(event.target.value)}
+                onBlur={formatReceiveAmountInput}
+                placeholder={`请输入 ${tradeData.receiveCurrency} 金额`}
+              />
+              <span className="amount-currency">{tradeData.receiveCurrency}</span>
+              {receiveAmountError ? (
+                <small className="amount-inline-text error-text">
+                  <span className="tip-icon" aria-hidden="true">!</span>
+                  {receiveAmountError}
+                </small>
+              ) : null}
+            </div>
+          ),
+        },
         { label: '收款银行', value: tradeData.receiverBank },
-        { label: '收款金额', value: `${tradeData.receiveAmount} ${tradeData.receiveCurrency}` },
         { label: '收款账户', value: 'TH42 0192 7788 0055 3341' },
+        { label: '付款金额（系统折算）', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
       ]} />
+      <div className="page-tip">
+        按 {tradeData.receiveCurrency} 录入，系统将自动折算 {tradeData.payCurrency}。当前规则：收款金额需为{' '}
+        {requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {tradeData.receiveCurrency}
+        （对应 {formattedPayAmount} {tradeData.payCurrency}）。
+      </div>
+      <div className="page-tip rate-tip">
+        <div className="rate-tip-row">
+          <span>当前汇率：{fxRateDisplay}{fxDate ? `（日期：${fxDate}）` : ''}</span>
+          <button type="button" className="btn secondary rate-refresh-btn" onClick={loadFxRate} disabled={isRefreshingFx}>
+            {isRefreshingFx ? '刷新中...' : '刷新汇率'}
+          </button>
+        </div>
+        {fxError ? <div className="rate-error">{fxError}</div> : null}
+      </div>
     </SectionCard>,
-    <SectionCard title="贸易背景录入">
+    <SectionCard title="贸易背景与单据上传">
       <KvGrid items={[
         { label: '贸易类型', value: tradeData.tradeType },
         { label: '货物名称', value: tradeData.goods },
         { label: '合同编号', value: 'SZ-TH-2026-0418' },
         { label: '报关方式', value: '一般贸易' },
       ]} />
+      <UploadList />
     </SectionCard>,
-    <SectionCard title="单据上传"><UploadList /></SectionCard>,
     null,
     <SectionCard title="转账确认">
       <KvGrid items={[
-        { label: '汇率', value: tradeData.fxRate },
-        { label: '汇兑后金额', value: `${tradeData.receiveAmount} ${tradeData.receiveCurrency}` },
+        { label: '汇率', value: fxRateDisplay },
+        { label: '收款金额（输入值）', value: `${formattedReceiveAmount} ${tradeData.receiveCurrency}` },
+        { label: '付款金额（系统折算）', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
         { label: '手续费', value: '0.00 CNY（演示）' },
         { label: '到账模式', value: '实时到账' },
       ]} />
@@ -303,8 +430,8 @@ function App() {
         <h4>交易已成功完成</h4>
         <KvGrid items={[
           { label: '交易流水号', value: 'TXN-MB-20260420-889912' },
-          { label: '付款金额', value: `${tradeData.payAmount} ${tradeData.payCurrency}` },
-          { label: '收款金额', value: `${tradeData.receiveAmount} ${tradeData.receiveCurrency}` },
+          { label: '付款金额', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
+          { label: '收款金额', value: `${formattedReceiveAmount} ${tradeData.receiveCurrency}` },
           { label: '完成时间', value: '2026-04-20 15:26:18' },
         ]} />
       </div>
@@ -324,8 +451,8 @@ function App() {
   ]
 
   const canPrev = flowStep > 0
-  const canNext = flowStep < FLOW_STEPS.length - 1
-  const lockPreviousSteps = flowStep >= 7 && flowStep <= 10
+  const canNext = flowStep < FLOW_STEPS.length - 1 && !(flowStep === 1 && !isReceiveAmountValid)
+  const lockPreviousSteps = flowStep >= 5 && flowStep <= 7
 
   if (view === 'login') {
     return (
@@ -406,9 +533,9 @@ function App() {
               <strong className="step-page-title">{FLOW_STEPS[flowStep]}</strong>
             </div>
             <div className="step-page-body">
-              {flowStep === 5 ? (
+              {flowStep === 3 ? (
                 <div className="processing-inline-tip">正在自动校验交易要素，请稍候...</div>
-              ) : flowStep === 7 ? (
+              ) : flowStep === 5 ? (
                 <div className="processing-inline-tip">正在提交到 mBrige 网络，请稍候...</div>
               ) : (
                 stepContent[flowStep]
