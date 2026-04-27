@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const FLOW_STEPS = [
-  '通道选 mBridge',
+  '通道选择',
   '付款信息',
   '收款信息',
   '贸易背景',
@@ -17,7 +17,7 @@ const FLOW_STEPS = [
 const tradeData = {
   orderNo: 'MB-20260420-0007',
   payerCompany: '深圳星海电子有限公司',
-  payerBank: '中国银行深圳分行',
+  payerBank: '宇信科技金融分行',
   payCurrency: 'CNY',
   payAmount: '1,000,000.00',
   receiverCompany: 'Bangkok Global Trade Co., Ltd.',
@@ -39,7 +39,7 @@ const LOADING_TASKS = {
   ],
   processing: [
     '锁定付款账户与头寸',
-    '提交 mBridge 跨境指令',
+    '提交 mBrige 跨境指令',
     '多边账本共识确认',
     '收款行清算入账处理',
     '生成交易回执与审计日志',
@@ -95,7 +95,7 @@ function UploadList() {
   )
 }
 
-function HomeDashboard({ onStartMBridge }) {
+function HomeDashboard({ onStartMBrige }) {
   return (
     <section className="home-dashboard">
       <div className="dashboard-topbar">
@@ -126,8 +126,8 @@ function HomeDashboard({ onStartMBridge }) {
               <button type="button" className="quick-item"><span>结汇</span></button>
               <button type="button" className="quick-item"><span>销户</span></button>
               <button type="button" className="quick-item"><span>客户360查询</span></button>
-              <button type="button" className="quick-item mbridge-entry" onClick={onStartMBridge}>
-                <span>mBridge 交易</span>
+              <button type="button" className="quick-item mbridge-entry" onClick={onStartMBrige}>
+                <span>国际货币贸易结算</span>
               </button>
             </div>
           </div>
@@ -172,7 +172,7 @@ function HomeDashboard({ onStartMBridge }) {
           <div className="right-card">
             <h4>紧急公告</h4>
             <ul className="notice-list">
-              <li>mBridge 跨境结算维护窗口：今日 20:00-20:30</li>
+              <li>mBrige 跨境结算维护窗口：今日 20:00-20:30</li>
               <li>货物贸易真实性审核策略已更新</li>
               <li>泰铢清算通道已恢复，状态正常</li>
             </ul>
@@ -190,7 +190,7 @@ function HomeDashboard({ onStartMBridge }) {
           <div className="right-card">
             <h4>系统运行状态</h4>
             <div className="status-grid">
-              <div><span>mBridge 网络</span><em className="ok">正常</em></div>
+              <div><span>mBrige 网络</span><em className="ok">正常</em></div>
               <div><span>反洗钱引擎</span><em className="ok">正常</em></div>
               <div><span>外汇申报接口</span><em className="warn">轻微延迟</em></div>
             </div>
@@ -257,7 +257,7 @@ function App() {
   const stepContent = [
     <SectionCard title="通道选择">
       <KvGrid items={[
-        { label: '通道', value: 'mBridge 多边央行数字货币桥' },
+        { label: '通道', value: 'mBrige 多边央行数字货币桥' },
         { label: '路由策略', value: '优先最优汇率 + 实时到账' },
         { label: '预计时效', value: 'T+0，约 30 秒内' },
         { label: '网络状态', value: '可用' },
@@ -332,7 +332,7 @@ function App() {
       <main className="login-page">
         <section className="login-hero">
           <div className="brand-row"><div className="brand-mark" /><strong> 柜面系统</strong></div>
-          <h1>欢迎登录中国银行深圳分行金融工作台</h1>
+          <h1>欢迎登录宇信科技金融分行金融工作台</h1>
           <p>支持跨境支付经办、复核、回单申报全流程统一处理。</p>
           <div className="hero-cubes"><span /><span /><span /></div>
         </section>
@@ -345,7 +345,7 @@ function App() {
           </div>
           <h3>柜员登录</h3>
           <label className="field"><span>柜员号</span><input value="TELLER_SZ_0091" readOnly /></label>
-          <label className="field"><span>所属机构</span><input value="中国银行深圳分行" readOnly /></label>
+          <label className="field"><span>所属机构</span><input value="宇信科技金融分行" readOnly /></label>
           <label className="field"><span>登录口令</span><input value="••••••••" readOnly /></label>
           <button type="button" className="btn primary login-btn" onClick={() => setView('home')}>
             立即登录
@@ -358,7 +358,7 @@ function App() {
   if (view === 'home') {
     return (
       <main className="app">
-        <HomeDashboard onStartMBridge={() => { setFlowStep(0); setView('flow') }} />
+        <HomeDashboard onStartMBrige={() => { setFlowStep(0); setView('flow') }} />
       </main>
     )
   }
@@ -367,7 +367,7 @@ function App() {
     <main className="app">
       <header className="header">
         <div>
-          <h1>数字人民币 mBridge 跨境支付</h1>
+          <h1>数字人民币 mBrige 跨境支付</h1>
           {/* <p>银行正式蓝色风格 Demo - 全套交易页面</p> */}
         </div>
         <div className="badge">进度 {progress}%</div>
@@ -409,7 +409,7 @@ function App() {
               {flowStep === 5 ? (
                 <div className="processing-inline-tip">正在自动校验交易要素，请稍候...</div>
               ) : flowStep === 7 ? (
-                <div className="processing-inline-tip">正在提交到 mBridge 网络，请稍候...</div>
+                <div className="processing-inline-tip">正在提交到 mBrige 网络，请稍候...</div>
               ) : (
                 stepContent[flowStep]
               )}
@@ -429,7 +429,7 @@ function App() {
 
       <section className="promo-footer">
         <div>
-          <strong>mBridge 跨境支付平台</strong>
+          <strong>mBrige 跨境支付平台</strong>
           <p>实时结算、链路可视、合规可审计，助力企业跨境资金高效流转。</p>
         </div>
         <div className="promo-tags">
@@ -442,7 +442,7 @@ function App() {
         <div className="loading-overlay" role="status" aria-live="polite">
           <div className="loading-card">
             <div className="loader-ring" />
-            <p>{loadingPhase === 'checking' ? '自动校验中' : 'mBridge 网络处理中'}</p>
+            <p>{loadingPhase === 'checking' ? '自动校验中' : 'mBrige 网络处理中'}</p>
             <small>{loadingPhase === 'checking' ? '正在核验主体一致性、金额匹配与合规规则...' : '正在完成跨境结算与多边账本记账...'}</small>
             <div className="loading-progress-track">
               <div className="loading-progress-fill" style={{ width: `${(loadingProgress / LOADING_TASKS[loadingPhase].length) * 100}%` }} />
