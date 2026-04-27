@@ -363,7 +363,7 @@ function App() {
       <KvGrid items={[
         { label: '付款企业', value: tradeData.payerCompany },
         { label: '付款银行', value: tradeData.payerBank },
-        { label: '付款账户', value: '1045 0001 8823 5600 22' },
+        { label: '付款账户', value: 'TW7b2G5mK9jD4sF1cH6nP0qA8rE2zX' },
         { label: '收款企业', value: tradeData.receiverCompany },
         {
           label: '输入金额（收款币种）',
@@ -390,7 +390,7 @@ function App() {
           ),
         },
         { label: '收款银行', value: tradeData.receiverBank },
-        { label: '收款账户', value: 'TH42 0192 7788 0055 3341' },
+        { label: '收款账户', value: 'TQ1s9R7kF2dG5hJ8zL0pN3vB6xC' },
         { label: '付款金额（系统折算）', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
       ]} />
       <div className="page-tip">
