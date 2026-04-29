@@ -209,6 +209,7 @@ function App() {
   const [fxDate, setFxDate] = useState('')
   const [fxError, setFxError] = useState('')
   const [theme, setTheme] = useState('default')
+  const [selectedLoginRole, setSelectedLoginRole] = useState('teller')
 
   const progress = useMemo(
     () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
@@ -220,10 +221,9 @@ function App() {
   const requiredReceiveAmount = fixedPayAmountRmb * fxRateNumber
   const sanitizedReceiveAmount = receiveAmountInput.replaceAll(',', '').trim()
   const receiveAmountNumber = Number(sanitizedReceiveAmount)
-  const receiveAmountPattern = /^\d+(\.\d{1,2})?$/
   const receiveAmountError = useMemo(() => {
     if (!sanitizedReceiveAmount) return `请输入收款金额（${tradeData.receiveCurrency}）`
-    if (!receiveAmountPattern.test(sanitizedReceiveAmount)) return '金额格式有误，请输入数字且最多保留 2 位小数'
+    if (!/^\d+(\.\d{1,2})?$/.test(sanitizedReceiveAmount)) return '金额格式有误，请输入数字且最多保留 2 位小数'
     if (Number.isNaN(receiveAmountNumber)) return '收款金额无法识别，请重新输入'
     if (receiveAmountNumber <= 0) return '收款金额需大于 0'
     if (Math.abs(receiveAmountNumber - requiredReceiveAmount) > 0.0001) {
@@ -275,26 +275,34 @@ function App() {
 
       setLiveFxRate(nextRate)
       setFxDate(nextDate)
-    } catch (error) {
+    } catch {
       setFxError('实时汇率获取失败，已使用默认汇率（4.5）')
     }
   }, [])
 
   useEffect(() => {
-    loadFxRate()
+    // Defer to avoid triggering cascading renders inside the effect body.
+    setTimeout(() => {
+      void loadFxRate()
+    }, 0)
   }, [loadFxRate])
 
   useEffect(() => {
     if (view !== 'flow') {
-      setLoadingPhase('')
-      setLoadingProgress(0)
+      // Defer state reset to avoid cascading renders in effect body.
+      setTimeout(() => {
+        setLoadingPhase('')
+        setLoadingProgress(0)
+      }, 0)
       return
     }
     let finishTimer
     let intervalTimer
     if (flowStep === 3) {
-      setLoadingPhase('checking')
-      setLoadingProgress(0)
+      setTimeout(() => {
+        setLoadingPhase('checking')
+        setLoadingProgress(0)
+      }, 0)
       intervalTimer = window.setInterval(() => {
         setLoadingProgress((prev) => Math.min(prev + 1, LOADING_TASKS.checking.length))
       }, 1000)
@@ -305,8 +313,10 @@ function App() {
         setFlowStep(4)
       }, 5000)
     } else if (flowStep === 5) {
-      setLoadingPhase('processing')
-      setLoadingProgress(0)
+      setTimeout(() => {
+        setLoadingPhase('processing')
+        setLoadingProgress(0)
+      }, 0)
       intervalTimer = window.setInterval(() => {
         setLoadingProgress((prev) => Math.min(prev + 1, LOADING_TASKS.processing.length))
       }, 1000)
@@ -317,8 +327,10 @@ function App() {
         setFlowStep(6)
       }, 5000)
     } else {
-      setLoadingPhase('')
-      setLoadingProgress(0)
+      setTimeout(() => {
+        setLoadingPhase('')
+        setLoadingProgress(0)
+      }, 0)
     }
     return () => {
       if (finishTimer) window.clearTimeout(finishTimer)
@@ -464,11 +476,33 @@ function App() {
             <button type="button">人脸识别</button>
             <button type="button">组合登录</button>
           </div>
-          <h3>柜员登录</h3>
-          <label className="field"><span>柜员号</span><input value="TELLER_SZ_0091" readOnly /></label>
+          <div className="login-identity-row">
+            <h3>登录身份</h3>
+            <select
+              className="login-identity-select"
+              value={selectedLoginRole}
+              onChange={(e) => setSelectedLoginRole(e.target.value)}
+              aria-label="选择登录身份"
+            >
+              <option value="teller">柜员登录</option>
+              <option value="admin">管理员登录</option>
+            </select>
+          </div>
+
+          <label className="field">
+            <span>{selectedLoginRole === 'admin' ? '管理员账号' : '柜员号'}</span>
+            <input value={selectedLoginRole === 'admin' ? 'ADMIN_SZ_0001' : 'TELLER_SZ_0091'} readOnly />
+          </label>
           <label className="field"><span>所属机构</span><input value="宇信科技金融分行" readOnly /></label>
           <label className="field"><span>登录口令</span><input value="••••••••" readOnly /></label>
-          <button type="button" className="btn primary login-btn" onClick={() => setView('home')}>
+
+          <button
+            type="button"
+            className="btn primary login-btn"
+            onClick={() => {
+              setView('home')
+            }}
+          >
             立即登录
           </button>
         </section>
