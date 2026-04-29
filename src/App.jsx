@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
+import AdminPage from './AdminPage.jsx'
 
 const FLOW_STEPS = [
   '通道选择',
@@ -210,6 +211,12 @@ function App() {
   const [fxError, setFxError] = useState('')
   const [theme, setTheme] = useState('default')
   const [selectedLoginRole, setSelectedLoginRole] = useState('teller')
+  const [loginTimeText, setLoginTimeText] = useState('')
+
+  const formatDateTime = (d) => {
+    const pad = (n) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+  }
 
   const progress = useMemo(
     () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
@@ -500,13 +507,36 @@ function App() {
             type="button"
             className="btn primary login-btn"
             onClick={() => {
-              setView('home')
+              const now = new Date()
+              setLoginTimeText(formatDateTime(now))
+              if (selectedLoginRole === 'admin') {
+                setView('admin')
+              } else {
+                setView('home')
+              }
             }}
           >
-            立即登录
+            {selectedLoginRole === 'admin' ? '管理员登录' : '立即登录'}
           </button>
         </section>
       </main>
+    )
+  }
+
+  if (view === 'admin') {
+    return (
+      <AdminPage
+        theme={theme}
+        loginTimeText={loginTimeText}
+        onLogout={() => {
+          setLoginTimeText('')
+          setSelectedLoginRole('teller')
+          setView('login')
+        }}
+        onGoHome={() => {
+          setView('home')
+        }}
+      />
     )
   }
 
