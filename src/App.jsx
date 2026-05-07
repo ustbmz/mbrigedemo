@@ -1,49 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import './App.css'
 import AdminPage from './AdminPage.jsx'
-
-const FLOW_STEPS = [
-  '通道选择',
-  '付款与收款信息',
-  '贸易背景与单据上传',
-  '自动校验',
-  '转账确认',
-  '处理中',
-  '交易成功',
-  '回单申报',
-]
-
-const tradeData = {
-  orderNo: 'MB-20260420-0007',
-  payerCompany: '深圳星海电子有限公司',
-  payerBank: '宇信科技金融分行',
-  payCurrency: 'CNY',
-  payAmount: '1,000,000.00',
-  receiverCompany: 'Bangkok Global Trade Co., Ltd.',
-  receiverBank: 'Bangkok International Bank',
-  receiveCurrency: 'THB',
-  receiveAmount: '4,500,000.00',
-  fxRate: '1 CNY = 4.5 THB',
-  tradeType: '货物贸易结算',
-  goods: '消费电子零部件',
-}
-
-const LOADING_TASKS = {
-  checking: [
-    '校验付款主体与账户权限',
-    '核验收款方信息一致性',
-    '按收款金额执行汇率折算与单据金额比对',
-    '执行反洗钱与制裁筛查',
-    '生成自动校验报告',
-  ],
-  processing: [
-    '锁定付款账户与头寸',
-    '提交 mBrige 跨境指令',
-    '多边账本共识确认',
-    '收款行清算入账处理',
-    '生成交易回执与审计日志',
-  ],
-}
+import LanguageSwitch from './LanguageSwitch.jsx'
 
 function SectionCard({ title, children }) {
   return (
@@ -68,90 +27,93 @@ function KvGrid({ items }) {
 }
 
 function UploadList() {
+  const { t } = useTranslation()
   return (
     <div className="upload-list">
       <div className="upload-dropzone">
-        <p>支持 PDF/JPG/PNG，单文件不超过 20MB</p>
+        <p>{t('upload.hint')}</p>
         <button type="button" className="btn secondary upload-trigger">
-          选择文件
+          {t('upload.choose')}
         </button>
       </div>
       <div className="upload-item">
-        <span>商业发票.pdf</span>
-        <em>已上传</em>
+        <span>{t('upload.file1')}</span>
+        <em>{t('upload.status')}</em>
       </div>
       <div className="upload-item">
-        <span>购销合同.pdf</span>
-        <em>已上传</em>
+        <span>{t('upload.file2')}</span>
+        <em>{t('upload.status')}</em>
       </div>
       <div className="upload-item">
-        <span>报关单.pdf</span>
-        <em>已上传</em>
+        <span>{t('upload.file3')}</span>
+        <em>{t('upload.status')}</em>
       </div>
     </div>
   )
 }
 
 function HomeDashboard({ onStartMBrige }) {
+  const { t } = useTranslation()
   return (
     <section className="home-dashboard">
       <div className="dashboard-topbar">
-        <strong>宇信科技 | 金融工作台</strong>
-        <div className="dashboard-search">请输入内容</div>
+        <strong>{t('home.topbarBrand')}</strong>
+        <div className="dashboard-search">{t('home.searchPlaceholder')}</div>
         <div className="topbar-actions">
-          <span>消息</span>
-          <span>帮助</span>
-          <span>工号：999990</span>
+          <LanguageSwitch />
+          <span>{t('home.navMsg')}</span>
+          <span>{t('home.navHelp')}</span>
+          <span>{t('home.navStaff')}</span>
         </div>
       </div>
 
       <div className="dashboard-body">
         <div className="dashboard-left">
           <div className="welcome-card">
-            <h3>尊敬的王丹女士，欢迎您！</h3>
-            <p>上次登录时间：2026-04-20 08:22:32</p>
-            <small>当前流水号：T202609180023</small>
+            <h3>{t('home.welcomeTitle')}</h3>
+            <p>{t('home.welcomeLastLogin')}</p>
+            <small>{t('home.welcomeSerial')}</small>
           </div>
 
           <div className="quick-panel">
-            <h4>常用功能</h4>
+            <h4>{t('home.quickTitle')}</h4>
             <div className="quick-grid">
-              <button type="button" className="quick-item"><span>开户</span></button>
-              <button type="button" className="quick-item"><span>付款</span></button>
-              <button type="button" className="quick-item"><span>复核</span></button>
-              <button type="button" className="quick-item"><span>综合查询</span></button>
-              <button type="button" className="quick-item"><span>结汇</span></button>
-              <button type="button" className="quick-item"><span>销户</span></button>
-              <button type="button" className="quick-item"><span>客户360查询</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quickOpen')}</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quickPay')}</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quickReview')}</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quickQuery')}</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quickFx')}</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quickClose')}</span></button>
+              <button type="button" className="quick-item"><span>{t('home.quick360')}</span></button>
               <button type="button" className="quick-item mbridge-entry" onClick={onStartMBrige}>
-                <span>国际货币贸易结算</span>
+                <span>{t('home.quickMbridge')}</span>
               </button>
             </div>
           </div>
 
           <div className="data-panel">
-            <h4>今日跨境交易概览</h4>
+            <h4>{t('home.overviewTitle')}</h4>
             <div className="kpi-row">
-              <div className="kpi-item"><small>交易笔数</small><strong>128</strong></div>
-              <div className="kpi-item"><small>交易总额（CNY）</small><strong>58,420,000</strong></div>
-              <div className="kpi-item"><small>成功率</small><strong>99.21%</strong></div>
+              <div className="kpi-item"><small>{t('home.kpiCount')}</small><strong>128</strong></div>
+              <div className="kpi-item"><small>{t('home.kpiTotal')}</small><strong>58,420,000</strong></div>
+              <div className="kpi-item"><small>{t('home.kpiSuccess')}</small><strong>99.21%</strong></div>
             </div>
           </div>
 
           <div className="data-panel">
-            <h4>近期交易</h4>
+            <h4>{t('home.recentTitle')}</h4>
             <div className="mini-table">
               <div className="mini-table-head">
-                <span>流水号</span><span>币种/金额</span><span>状态</span>
+                <span>{t('home.colRef')}</span><span>{t('home.colAmt')}</span><span>{t('home.colStatus')}</span>
               </div>
               <div className="mini-table-row">
-                <span>MB-20260420-0011</span><span>CNY 680,000 / THB 3,060,000</span><em className="ok">成功</em>
+                <span>MB-20260420-0011</span><span>CNY 680,000 / THB 3,060,000</span><em className="ok">{t('home.txnStatusOk')}</em>
               </div>
               <div className="mini-table-row">
-                <span>MB-20260420-0010</span><span>CNY 220,000 / AED 112,200</span><em className="wait">处理中</em>
+                <span>MB-20260420-0010</span><span>CNY 220,000 / AED 112,200</span><em className="wait">{t('home.txnStatusWait')}</em>
               </div>
               <div className="mini-table-row">
-                <span>MB-20260420-0009</span><span>CNY 1,000,000 / THB 4,500,000</span><em className="ok">成功</em>
+                <span>MB-20260420-0009</span><span>CNY 1,000,000 / THB 4,500,000</span><em className="ok">{t('home.txnStatusOk')}</em>
               </div>
             </div>
           </div>
@@ -159,24 +121,24 @@ function HomeDashboard({ onStartMBrige }) {
 
         <aside className="dashboard-right">
           <div className="right-card">
-            <h4>代办事项</h4>
+            <h4>{t('home.todoTitle')}</h4>
             <div className="todo-metrics">
-              <div><strong>12</strong><small>待复核任务</small></div>
-              <div><strong>26</strong><small>工作事项备忘</small></div>
+              <div><strong>12</strong><small>{t('home.todoReview')}</small></div>
+              <div><strong>26</strong><small>{t('home.todoMemo')}</small></div>
             </div>
           </div>
 
           <div className="right-card">
-            <h4>紧急公告</h4>
+            <h4>{t('home.noticeTitle')}</h4>
             <ul className="notice-list">
-              <li>mBrige 跨境结算维护窗口：今日 20:00-20:30</li>
-              <li>货物贸易真实性审核策略已更新</li>
-              <li>泰铢清算通道已恢复，状态正常</li>
+              <li>{t('home.notice1')}</li>
+              <li>{t('home.notice2')}</li>
+              <li>{t('home.notice3')}</li>
             </ul>
           </div>
 
           <div className="right-card">
-            <h4>汇率看板</h4>
+            <h4>{t('home.rateTitle')}</h4>
             <ul className="rate-list">
               <li><span>CNY/THB</span><strong>4.5000</strong></li>
               <li><span>CNY/AED</span><strong>0.5100</strong></li>
@@ -185,11 +147,11 @@ function HomeDashboard({ onStartMBrige }) {
           </div>
 
           <div className="right-card">
-            <h4>系统运行状态</h4>
+            <h4>{t('home.sysTitle')}</h4>
             <div className="status-grid">
-              <div><span>mBrige 网络</span><em className="ok">正常</em></div>
-              <div><span>反洗钱引擎</span><em className="ok">正常</em></div>
-              <div><span>外汇申报接口</span><em className="warn">轻微延迟</em></div>
+              <div><span>{t('home.sysMbridge')}</span><em className="ok">{t('home.sysStatusOk')}</em></div>
+              <div><span>{t('home.sysAml')}</span><em className="ok">{t('home.sysStatusOk')}</em></div>
+              <div><span>{t('home.sysFxApi')}</span><em className="warn">{t('home.sysStatusWarn')}</em></div>
             </div>
           </div>
         </aside>
@@ -199,6 +161,7 @@ function HomeDashboard({ onStartMBrige }) {
 }
 
 function App() {
+  const { t, i18n } = useTranslation()
   const [view, setView] = useState('login')
   const [flowStep, setFlowStep] = useState(0)
   const [loadingPhase, setLoadingPhase] = useState('')
@@ -213,31 +176,71 @@ function App() {
   const [selectedLoginRole, setSelectedLoginRole] = useState('teller')
   const [loginTimeText, setLoginTimeText] = useState('')
 
+  const trade = useMemo(
+    () => ({
+      orderNo: t('trade.orderNo'),
+      payerCompany: t('trade.payerCompany'),
+      payerBank: t('trade.payerBank'),
+      payCurrency: t('trade.payCurrency'),
+      payAmount: t('trade.payAmount'),
+      receiverCompany: t('trade.receiverCompany'),
+      receiverBank: t('trade.receiverBank'),
+      receiveCurrency: t('trade.receiveCurrency'),
+      receiveAmount: t('trade.receiveAmount'),
+      fxRate: t('trade.fxRate'),
+      tradeType: t('trade.tradeType'),
+      goods: t('trade.goods'),
+      payerAcct: t('trade.payerAcct'),
+      receiverAcct: t('trade.receiverAcct'),
+      contractNo: t('trade.contractNo'),
+    }),
+    [t, i18n.language], // eslint-disable-line react-hooks/exhaustive-deps -- `t` is stable; invalidate on locale change
+  )
+
+  const flowSteps = useMemo(() => {
+    const steps = t('flow.steps', { returnObjects: true })
+    return Array.isArray(steps) ? steps : []
+  }, [t, i18n.language]) // eslint-disable-line react-hooks/exhaustive-deps -- `t` is stable; invalidate on locale change
+
+  const loadingTasks = useMemo(() => {
+    const checking = t('loading.checking', { returnObjects: true })
+    const processing = t('loading.processing', { returnObjects: true })
+    return {
+      checking: Array.isArray(checking) ? checking : [],
+      processing: Array.isArray(processing) ? processing : [],
+    }
+  }, [t, i18n.language]) // eslint-disable-line react-hooks/exhaustive-deps -- `t` is stable; invalidate on locale change
+
   const formatDateTime = (d) => {
     const pad = (n) => String(n).padStart(2, '0')
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
   }
 
   const progress = useMemo(
-    () => Math.round(((flowStep + 1) / FLOW_STEPS.length) * 100),
-    [flowStep],
+    () => Math.round(((flowStep + 1) / flowSteps.length) * 100),
+    [flowStep, flowSteps.length],
   )
   const channelOptions = ['MBrige', 'SWIFT', 'CIPS']
   const fxRateNumber = liveFxRate
-  const fixedPayAmountRmb = Number(tradeData.payAmount.replaceAll(',', ''))
+  const fixedPayAmountRmb = Number(trade.payAmount.replaceAll(',', ''))
   const requiredReceiveAmount = fixedPayAmountRmb * fxRateNumber
   const sanitizedReceiveAmount = receiveAmountInput.replaceAll(',', '').trim()
   const receiveAmountNumber = Number(sanitizedReceiveAmount)
   const receiveAmountError = useMemo(() => {
-    if (!sanitizedReceiveAmount) return `请输入收款金额（${tradeData.receiveCurrency}）`
-    if (!/^\d+(\.\d{1,2})?$/.test(sanitizedReceiveAmount)) return '金额格式有误，请输入数字且最多保留 2 位小数'
-    if (Number.isNaN(receiveAmountNumber)) return '收款金额无法识别，请重新输入'
-    if (receiveAmountNumber <= 0) return '收款金额需大于 0'
+    if (!sanitizedReceiveAmount) return t('errors.receiveEmpty', { currency: trade.receiveCurrency })
+    if (!/^\d+(\.\d{1,2})?$/.test(sanitizedReceiveAmount)) return t('errors.receiveFormat')
+    if (Number.isNaN(receiveAmountNumber)) return t('errors.receiveNaN')
+    if (receiveAmountNumber <= 0) return t('errors.receiveNonPositive')
     if (Math.abs(receiveAmountNumber - requiredReceiveAmount) > 0.0001) {
-      return `金额校验未通过：收款金额应为 ${requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tradeData.receiveCurrency}（按当前汇率对应固定付款金额 ${fixedPayAmountRmb.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tradeData.payCurrency}）`
+      return t('errors.receiveMismatch', {
+        required: requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        recvCurrency: trade.receiveCurrency,
+        payAmount: fixedPayAmountRmb.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        payCurrency: trade.payCurrency,
+      })
     }
     return ''
-  }, [fixedPayAmountRmb, receiveAmountNumber, requiredReceiveAmount, sanitizedReceiveAmount])
+  }, [fixedPayAmountRmb, receiveAmountNumber, requiredReceiveAmount, sanitizedReceiveAmount, trade, t])
   const displayReceiveAmountError = receiveAmountTouched ? receiveAmountError : ''
   const isReceiveAmountValid = !receiveAmountError
   const canDerivePayAmount = !Number.isNaN(receiveAmountNumber) && receiveAmountNumber > 0
@@ -245,7 +248,7 @@ function App() {
     ? receiveAmountNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : receiveAmountInput || '-'
   const formattedPayAmount = fixedPayAmountRmb.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  const fxRateDisplay = `1 ${tradeData.payCurrency} = ${fxRateNumber.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${tradeData.receiveCurrency}`
+  const fxRateDisplay = `1 ${trade.payCurrency} = ${fxRateNumber.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${trade.receiveCurrency}`
 
   const formatReceiveAmountInput = () => {
     setReceiveAmountTouched(true)
@@ -283,9 +286,9 @@ function App() {
       setLiveFxRate(nextRate)
       setFxDate(nextDate)
     } catch {
-      setFxError('实时汇率获取失败，已使用默认汇率（4.5）')
+      setFxError(t('errors.fxRateFailed'))
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     // Defer to avoid triggering cascading renders inside the effect body.
@@ -311,7 +314,7 @@ function App() {
         setLoadingProgress(0)
       }, 0)
       intervalTimer = window.setInterval(() => {
-        setLoadingProgress((prev) => Math.min(prev + 1, LOADING_TASKS.checking.length))
+        setLoadingProgress((prev) => Math.min(prev + 1, loadingTasks.checking.length))
       }, 1000)
       finishTimer = window.setTimeout(() => {
         window.clearInterval(intervalTimer)
@@ -325,7 +328,7 @@ function App() {
         setLoadingProgress(0)
       }, 0)
       intervalTimer = window.setInterval(() => {
-        setLoadingProgress((prev) => Math.min(prev + 1, LOADING_TASKS.processing.length))
+        setLoadingProgress((prev) => Math.min(prev + 1, loadingTasks.processing.length))
       }, 1000)
       finishTimer = window.setTimeout(() => {
         window.clearInterval(intervalTimer)
@@ -343,13 +346,13 @@ function App() {
       if (finishTimer) window.clearTimeout(finishTimer)
       if (intervalTimer) window.clearInterval(intervalTimer)
     }
-  }, [flowStep, view])
+  }, [flowStep, view, loadingTasks.checking.length, loadingTasks.processing.length])
 
   const stepContent = [
-    <SectionCard title="通道选择">
+    <SectionCard title={t('flow.step1.sectionTitle')}>
       <div className="kv-grid">
         <div className="kv-item">
-          <span className="label">通道选择</span>
+          <span className="label">{t('flow.step1.labelChannel')}</span>
           <div>
             <select
               className="channel-select"
@@ -365,27 +368,27 @@ function App() {
           </div>
         </div>
         <div className="kv-item">
-          <span className="label">已选通道</span>
-          <strong>{selectedChannel || '未选择'}</strong>
+          <span className="label">{t('flow.step1.labelSelected')}</span>
+          <strong>{selectedChannel || t('flow.step1.notSelected')}</strong>
         </div>
         <div className="kv-item">
-          <span className="label">路由策略</span>
-          <strong>优先最优汇率 + 实时到账</strong>
+          <span className="label">{t('flow.step1.labelRouting')}</span>
+          <strong>{t('flow.step1.routingValue')}</strong>
         </div>
         <div className="kv-item">
-          <span className="label">预计时效</span>
-          <strong>T+0，约 30 秒内</strong>
+          <span className="label">{t('flow.step1.labelEta')}</span>
+          <strong>{t('flow.step1.etaValue')}</strong>
         </div>
       </div>
     </SectionCard>,
-    <SectionCard title="付款与收款信息填写">
+    <SectionCard title={t('flow.step2.sectionTitle')}>
       <KvGrid items={[
-        { label: '付款企业', value: tradeData.payerCompany },
-        { label: '付款银行', value: tradeData.payerBank },
-        { label: '付款账户', value: 'TW7b2G5mK9jD4sF1cH6nP0qA8rE2zX' },
-        { label: '收款企业', value: tradeData.receiverCompany },
+        { label: t('flow.step2.labelPayerCo'), value: trade.payerCompany },
+        { label: t('flow.step2.labelPayerBank'), value: trade.payerBank },
+        { label: t('flow.step2.labelPayerAcct'), value: trade.payerAcct },
+        { label: t('flow.step2.labelReceiverCo'), value: trade.receiverCompany },
         {
-          label: '输入金额（收款币种）',
+          label: t('flow.step2.labelAmountInput'),
           value: (
             <div className="amount-field-wrap">
               <input
@@ -396,9 +399,9 @@ function App() {
                   setReceiveAmountInput(event.target.value)
                 }}
                 onBlur={formatReceiveAmountInput}
-                placeholder={`请输入 ${tradeData.receiveCurrency} 金额`}
+                placeholder={t('flow.step2.placeholderAmount', { currency: trade.receiveCurrency })}
               />
-              <span className="amount-currency">{tradeData.receiveCurrency}</span>
+              <span className="amount-currency">{trade.receiveCurrency}</span>
               {displayReceiveAmountError ? (
                 <small className="amount-inline-text error-text">
                   <span className="tip-icon" aria-hidden="true">!</span>
@@ -408,100 +411,106 @@ function App() {
             </div>
           ),
         },
-        { label: '收款银行', value: tradeData.receiverBank },
-        { label: '收款账户', value: 'TQ1s9R7kF2dG5hJ8zL0pN3vB6xC' },
-        { label: '付款金额（系统折算）', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
+        { label: t('flow.step2.labelReceiverBank'), value: trade.receiverBank },
+        { label: t('flow.step2.labelReceiverAcct'), value: trade.receiverAcct },
+        { label: t('flow.step2.labelPayDerived'), value: `${formattedPayAmount} ${trade.payCurrency}` },
       ]} />
       <div className="page-tip">
-        按 {tradeData.receiveCurrency} 录入，系统将自动折算 {tradeData.payCurrency}。当前规则：收款金额需为{' '}
-        {requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {tradeData.receiveCurrency}
-        （对应 {formattedPayAmount} {tradeData.payCurrency}）。
+        {t('flow.step2.tipRule', {
+          recv: trade.receiveCurrency,
+          pay: trade.payCurrency,
+          required: requiredReceiveAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          payAmt: formattedPayAmount,
+        })}
       </div>
     </SectionCard>,
-    <SectionCard title="贸易背景与单据上传">
+    <SectionCard title={t('flow.step3.sectionTitle')}>
       <KvGrid items={[
-        { label: '贸易类型', value: tradeData.tradeType },
-        { label: '货物名称', value: tradeData.goods },
-        { label: '合同编号', value: 'SZ-TH-2026-0418' },
-        { label: '报关方式', value: '一般贸易' },
+        { label: t('flow.step3.labelTradeType'), value: trade.tradeType },
+        { label: t('flow.step3.labelGoods'), value: trade.goods },
+        { label: t('flow.step3.labelContract'), value: trade.contractNo },
+        { label: t('flow.step3.labelCustoms'), value: t('flow.step3.customsValue') },
       ]} />
       <UploadList />
     </SectionCard>,
     null,
-    <SectionCard title="转账确认">
+    <SectionCard title={t('flow.step4.sectionTitle')}>
       <KvGrid items={[
-        { label: '汇率', value: fxRateDisplay },
-        { label: '收款金额（输入值）', value: `${formattedReceiveAmount} ${tradeData.receiveCurrency}` },
-        { label: '付款金额（系统折算）', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
-        { label: '手续费', value: '0.00 CNY（演示）' },
-        { label: '到账模式', value: '实时到账' },
+        { label: t('flow.step4.labelFx'), value: fxRateDisplay },
+        { label: t('flow.step4.labelRecvInput'), value: `${formattedReceiveAmount} ${trade.receiveCurrency}` },
+        { label: t('flow.step4.labelPayDerived'), value: `${formattedPayAmount} ${trade.payCurrency}` },
+        { label: t('flow.step4.labelFee'), value: t('flow.step4.feeValue') },
+        { label: t('flow.step4.labelSettlement'), value: t('flow.step4.settlementValue') },
       ]} />
     </SectionCard>,
     null,
-    <SectionCard title="交易成功">
+    <SectionCard title={t('flow.step6.sectionTitle')}>
       <div className="success-box">
-        <h4>交易已成功完成</h4>
+        <h4>{t('flow.step6.successHeading')}</h4>
         <KvGrid items={[
-          { label: '交易流水号', value: 'TXN-MB-20260420-889912' },
-          { label: '付款金额', value: `${formattedPayAmount} ${tradeData.payCurrency}` },
-          { label: '收款金额', value: `${formattedReceiveAmount} ${tradeData.receiveCurrency}` },
-          { label: '完成时间', value: '2026-04-20 15:26:18' },
+          { label: t('flow.step6.labelTxnId'), value: t('flow.step6.txnIdValue') },
+          { label: t('flow.step6.labelPayAmt'), value: `${formattedPayAmount} ${trade.payCurrency}` },
+          { label: t('flow.step6.labelRecvAmt'), value: `${formattedReceiveAmount} ${trade.receiveCurrency}` },
+          { label: t('flow.step6.labelDoneAt'), value: t('flow.step6.doneAtValue') },
         ]} />
       </div>
     </SectionCard>,
-    <SectionCard title="回单申报">
+    <SectionCard title={t('flow.step7.sectionTitle')}>
       <KvGrid items={[
-        { label: '回单状态', value: '待提交监管申报' },
-        { label: '申报口径', value: '货物贸易跨境收付汇' },
-        { label: '申报系统', value: '国家外汇管理局数字接口' },
-        { label: '操作建议', value: '点击“提交申报”完成闭环' },
+        { label: t('flow.step7.labelReceiptStatus'), value: t('flow.step7.receiptStatus') },
+        { label: t('flow.step7.labelDeclareScope'), value: t('flow.step7.declareScope') },
+        { label: t('flow.step7.labelDeclareSystem'), value: t('flow.step7.declareSystem') },
+        { label: t('flow.step7.labelSuggest'), value: t('flow.step7.suggest') },
       ]} />
       <div className="action-row">
-        <button type="button" className="btn secondary">下载电子回单</button>
-        <button type="button" className="btn primary">提交申报</button>
+        <button type="button" className="btn secondary">{t('flow.step7.download')}</button>
+        <button type="button" className="btn primary">{t('flow.step7.submit')}</button>
       </div>
     </SectionCard>,
   ]
 
   const canPrev = flowStep > 0
-  const canNext = flowStep < FLOW_STEPS.length - 1 && !(flowStep === 1 && !isReceiveAmountValid)
+  const canNext = flowStep < flowSteps.length - 1 && !(flowStep === 1 && !isReceiveAmountValid)
   const lockPreviousSteps = flowStep >= 5 && flowStep <= 7
 
   if (view === 'login') {
     return (
       <main className="login-page">
+        <div className="login-lang">
+          <LanguageSwitch />
+        </div>
         <section className="login-hero">
-          <div className="brand-row"><div className="brand-mark" /><strong> 柜面系统</strong></div>
-          <h1>欢迎登录宇信科技金融分行金融工作台</h1>
-          <p>支持跨境支付经办、复核、回单申报全流程统一处理。</p>
+          <div className="brand-row"><div className="brand-mark" /><strong>{t('login.brand')}</strong></div>
+          <h1>{t('login.title')}</h1>
+          <p>{t('login.subtitle')}</p>
           <div className="hero-cubes"><span /><span /><span /></div>
         </section>
         <section className="login-card">
           <div className="login-tabs">
-            <button type="button" className="active">密码登录</button>
-            <button type="button">指纹登录</button>
-            <button type="button">人脸识别</button>
-            <button type="button">组合登录</button>
+            <button type="button" className="active">{t('login.tabPassword')}</button>
+            <button type="button">{t('login.tabFingerprint')}</button>
+            <button type="button">{t('login.tabFace')}</button>
+            <button type="button">{t('login.tabCombo')}</button>
           </div>
           <div className="login-identity-row">
-            <h3>登录身份</h3>
+            <h3>{t('login.identityTitle')}</h3>
             <select
               className="login-identity-select"
               value={selectedLoginRole}
               onChange={(e) => setSelectedLoginRole(e.target.value)}
-              aria-label="选择登录身份"
+              aria-label={t('login.identityAria')}
             >
-              <option value="teller">柜员登录</option>
-              <option value="admin">管理员登录</option>
+              <option value="teller">{t('login.roleTeller')}</option>
+              <option value="admin">{t('login.roleAdmin')}</option>
             </select>
           </div>
 
           <label className="field">
-            <span>{selectedLoginRole === 'admin' ? '管理员账号' : '柜员号'}</span>
-            <input value={selectedLoginRole === 'admin' ? 'ADMIN_SZ_0001' : 'TELLER_SZ_0091'} readOnly />
+            <span>{selectedLoginRole === 'admin' ? t('login.labelAdminAcct') : t('login.labelTellerId')}</span>
+            <input value={selectedLoginRole === 'admin' ? t('login.adminAcct') : t('login.tellerAcct')} readOnly />
           </label>
-          <label className="field"><span>所属机构</span><input value="宇信科技金融分行" readOnly /></label>
-          <label className="field"><span>登录口令</span><input value="••••••••" readOnly /></label>
+          <label className="field"><span>{t('login.labelOrg')}</span><input value={t('login.orgValue')} readOnly /></label>
+          <label className="field"><span>{t('login.labelPassword')}</span><input value={t('login.passwordMask')} readOnly /></label>
 
           <button
             type="button"
@@ -516,7 +525,7 @@ function App() {
               }
             }}
           >
-            {selectedLoginRole === 'admin' ? '管理员登录' : '立即登录'}
+            {selectedLoginRole === 'admin' ? t('login.btnAdmin') : t('login.btnTeller')}
           </button>
         </section>
       </main>
@@ -552,45 +561,46 @@ function App() {
     <main className={`app theme-${theme}`}>
       <header className="header">
         <div>
-          <h1>国际货币贸易结算交易</h1>
+          <h1>{t('flow.headerTitle')}</h1>
           {/* <p>银行正式蓝色风格 Demo - 全套交易页面</p> */}
         </div>
         <div className="header-actions">
-          <div className="theme-switch" role="group" aria-label="页面风格切换">
+          <LanguageSwitch />
+          <div className="theme-switch" role="group" aria-label={t('flow.themeGroup')}>
             <button
               type="button"
               className={`theme-dot theme-dot-default ${theme === 'default' ? 'active' : ''}`}
               onClick={() => setTheme('default')}
-              aria-label="默认蓝风格"
-              title="默认蓝"
+              aria-label={t('flow.themeDefault')}
+              title={t('flow.themeDefaultTitle')}
             />
             <button
               type="button"
               className={`theme-dot theme-dot-dark ${theme === 'dark' ? 'active' : ''}`}
               onClick={() => setTheme('dark')}
-              aria-label="深色夜间风格"
-              title="深色夜间"
+              aria-label={t('flow.themeDark')}
+              title={t('flow.themeDarkTitle')}
             />
             <button
               type="button"
               className={`theme-dot theme-dot-green ${theme === 'green' ? 'active' : ''}`}
               onClick={() => setTheme('green')}
-              aria-label="墨绿商务风格"
-              title="墨绿商务"
+              aria-label={t('flow.themeGreen')}
+              title={t('flow.themeGreenTitle')}
             />
           </div>
-          <div className="badge">进度 {progress}%</div>
+          <div className="badge">{t('flow.progress', { pct: progress })}</div>
         </div>
       </header>
 
       <div className="workspace">
         <aside className="stepper">
-          {FLOW_STEPS.map((step, index) => {
+          {flowSteps.map((step, index) => {
             const state = index < flowStep ? 'done' : index === flowStep ? 'active' : 'todo'
             const disableJumpBack = lockPreviousSteps && index < flowStep
             return (
               <button
-                key={step}
+                key={index}
                 type="button"
                 className={`step-item ${state}`}
                 disabled={disableJumpBack}
@@ -607,22 +617,25 @@ function App() {
         </aside>
         <section className="panel">
           <div className="panel-title">
-            <h2>{FLOW_STEPS[flowStep]}</h2>
+            <h2>{flowSteps[flowStep]}</h2>
             <small>
-              汇率：{fxRateDisplay}{fxDate ? `（${fxDate}）` : ''}
-              {fxError ? '（默认）' : ''}
+              {t('flow.rateLine', {
+                rate: fxRateDisplay,
+                date: fxDate ? t('flow.rateDate', { date: fxDate }) : '',
+                fallback: fxError ? t('flow.rateFallback') : '',
+              })}
             </small>
           </div>
           <div className="step-page" data-step={flowStep + 1}>
             <div className="step-page-header">
               <span className="step-page-chip">STEP {flowStep + 1}</span>
-              <strong className="step-page-title">{FLOW_STEPS[flowStep]}</strong>
+              <strong className="step-page-title">{flowSteps[flowStep]}</strong>
             </div>
             <div className="step-page-body">
               {flowStep === 3 ? (
-                <div className="processing-inline-tip">正在自动校验交易要素，请稍候...</div>
+                <div className="processing-inline-tip">{t('flow.checkingTip')}</div>
               ) : flowStep === 5 ? (
-                <div className="processing-inline-tip">正在提交到 mBrige 网络，请稍候...</div>
+                <div className="processing-inline-tip">{t('flow.submittingTip')}</div>
               ) : (
                 stepContent[flowStep]
               )}
@@ -633,38 +646,38 @@ function App() {
 
       <footer className="footer-nav">
         <button type="button" className="btn secondary" onClick={() => setFlowStep((s) => s - 1)} disabled={!canPrev}>
-          上一步
+          {t('flow.footerPrev')}
         </button>
         <button type="button" className="btn primary" onClick={() => setFlowStep((s) => s + 1)} disabled={!canNext || Boolean(loadingPhase)}>
-          下一步
+          {t('flow.footerNext')}
         </button>
       </footer>
 
       <section className="promo-footer">
         <div>
-          <strong>mBrige 跨境支付平台</strong>
-          <p>实时结算、链路可视、合规可审计，助力企业跨境资金高效流转。</p>
+          <strong>{t('flow.promoTitle')}</strong>
+          <p>{t('flow.promoDesc')}</p>
         </div>
         <div className="promo-tags">
-          <span>T+0 到账</span><span>7x24 服务</span><span>多币种清算</span>
+          <span>{t('flow.promoTag1')}</span><span>{t('flow.promoTag2')}</span><span>{t('flow.promoTag3')}</span>
         </div>
-        <button type="button" className="btn secondary">查看产品介绍</button>
+        <button type="button" className="btn secondary">{t('flow.promoCta')}</button>
       </section>
 
       {loadingPhase ? (
         <div className="loading-overlay" role="status" aria-live="polite">
           <div className="loading-card">
             <div className="loader-ring" />
-            <p>{loadingPhase === 'checking' ? '自动校验中' : 'mBrige 网络处理中'}</p>
-            <small>{loadingPhase === 'checking' ? '正在核验主体一致性、金额匹配与合规规则...' : '正在完成跨境结算与多边账本记账...'}</small>
+            <p>{loadingPhase === 'checking' ? t('flow.loadingTitleChecking') : t('flow.loadingTitleProcessing')}</p>
+            <small>{loadingPhase === 'checking' ? t('flow.loadingSubChecking') : t('flow.loadingSubProcessing')}</small>
             <div className="loading-progress-track">
-              <div className="loading-progress-fill" style={{ width: `${(loadingProgress / LOADING_TASKS[loadingPhase].length) * 100}%` }} />
+              <div className="loading-progress-fill" style={{ width: `${(loadingProgress / loadingTasks[loadingPhase].length) * 100}%` }} />
             </div>
             <div className="loading-task-list">
-              {LOADING_TASKS[loadingPhase].map((task, index) => {
+              {loadingTasks[loadingPhase].map((task, index) => {
                 const done = index < loadingProgress
                 return (
-                  <div key={task} className={`loading-task ${done ? 'done' : ''}`}>
+                  <div key={index} className={`loading-task ${done ? 'done' : ''}`}>
                     <span>{done ? '✓' : index + 1}</span>
                     <em>{task}</em>
                   </div>

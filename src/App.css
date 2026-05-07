@@ -10,6 +10,7 @@
 }
 
 .login-page {
+  position: relative;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
@@ -107,7 +108,38 @@
 }
 .header p { margin-top: 6px; color: #6a7ea8; }
 .badge { padding: 10px 16px;  color: #19396d; font-weight: 600; }
-.header-actions { display: flex; align-items: center; gap: 12px; }
+.header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+
+.lang-switch {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid #cfe0fb;
+  background: #f4f8ff;
+  padding: 2px;
+  gap: 2px;
+}
+.lang-switch-btn {
+  border: none;
+  background: transparent;
+  color: #4d6aa3;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 1;
+}
+.lang-switch-btn.active {
+  background: #fff;
+  color: #1d59bf;
+  box-shadow: 0 1px 3px rgba(29, 89, 191, 0.15);
+}
+.login-lang {
+  position: absolute;
+  top: 18px;
+  right: 34px;
+  z-index: 2;
+}
 .theme-switch { display: inline-flex; align-items: center; gap: 8px; color: #5672a4; font-size: 12px; }
 .theme-dot {
   width: 20px;
