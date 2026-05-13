@@ -17,6 +17,15 @@ This repo is configured for GitHub Pages **sub-path** deployment.
 3. Open **Actions** and confirm **Deploy to GitHub Pages** completed successfully on the latest push. If GitHub asks to approve the **`github-pages`** environment once, approve it under **Settings → Environments**.
 4. Wait a minute and reload `https://ustbmz.github.io/mbrigedemo/` (with or without trailing slash).
 
+### White screen (blank page)
+
+If the tab stays blank, **View Page Source** (查看网页源代码):
+
+- **Good (Actions build is live):** you should see a `<script ... src="/mbrigedemo/assets/index-....js">` line.
+- **Bad (repo files are being served instead of `dist`):** you see `src="/src/main.jsx"` or `/src/main.jsx`. Then Pages is still publishing the **repository root** instead of the workflow artifact — set **Pages → Source → GitHub Actions**, save, and **re-run** the “Deploy to GitHub Pages” workflow from the **Actions** tab.
+
+The root `index.html` uses a **relative** entry script (`./src/main.jsx`) so that even a mistaken **branch** deploy under `/mbrigedemo/` can load the dev tree; production should still use the **built** `dist` from Actions.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
