@@ -21,10 +21,10 @@ This repo is configured for GitHub Pages **sub-path** deployment.
 
 If the tab stays blank, **View Page Source** (查看网页源代码):
 
-- **Good (Actions build is live):** you should see a `<script ... src="/mbrigedemo/assets/index-....js">` line.
-- **Bad (repo files are being served instead of `dist`):** you see `src="/src/main.jsx"` or `/src/main.jsx`. Then Pages is still publishing the **repository root** instead of the workflow artifact — set **Pages → Source → GitHub Actions**, save, and **re-run** the “Deploy to GitHub Pages” workflow from the **Actions** tab.
+- **Good (Actions build is live):** you should see `<script ... src="/mbrigedemo/assets/index-....js">` (hashed filename under `/mbrigedemo/assets/`).
+- **Bad:** you see `src="/src/main.jsx"` (leading slash only). The browser then requests `https://ustbmz.github.io/src/main.jsx` (wrong path) and the app never starts. Fix: **Settings → Pages → Source → GitHub Actions**, then run **Actions → Deploy to GitHub Pages → Re-run workflow** so the published site is the **`dist`** output from `npm run build`, not the raw repo `index.html`.
 
-The root `index.html` uses a **relative** entry script (`./src/main.jsx`) so that even a mistaken **branch** deploy under `/mbrigedemo/` can load the dev tree; production should still use the **built** `dist` from Actions.
+The entry script in `index.html` uses **`./src/main.jsx`** so that, if the HTML is ever opened from the `/mbrigedemo/` path, the request stays under that folder in dev; the **production** site must still be the **built** bundle from GitHub Actions.
 
 Currently, two official plugins are available:
 
