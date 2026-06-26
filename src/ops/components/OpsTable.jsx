@@ -10,19 +10,26 @@ export default function OpsTable({ columns, rows, onRowClick, emptyText }) {
         ))}
       </div>
       {rows.map((row) => (
-        <button
+        <div
           key={row.id}
-          type="button"
+          role={onRowClick ? 'button' : undefined}
+          tabIndex={onRowClick ? 0 : undefined}
           className={`ops-table-row ${onRowClick ? 'clickable' : ''}`}
           style={{ gridTemplateColumns: columns.map((c) => c.width || '1fr').join(' ') }}
-          onClick={() => onRowClick?.(row)}
+          onClick={onRowClick ? () => onRowClick(row) : undefined}
+          onKeyDown={onRowClick ? (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onRowClick(row)
+            }
+          } : undefined}
         >
           {columns.map((col) => (
             <span key={col.key} className={col.mono ? 'mono' : ''}>
               {col.render ? col.render(row) : row[col.key]}
             </span>
           ))}
-        </button>
+        </div>
       ))}
     </div>
   )

@@ -1,0 +1,41 @@
+/** 新增机构表单 — Mock 初始值 */
+
+export const emptyInstitutionForm = {
+  opCode: '',
+  nameZh: '',
+  nameEn: '',
+  instType: '',
+  address: '',
+  phone: '',
+  email: '',
+  currency: '',
+  walletNo: '',
+  walletName: '',
+  userName: '',
+  country: '',
+  region: '',
+  bankName: '',
+  bankAccount: '',
+  bic: '',
+  lei: '',
+}
+
+export const mockInstitutionFormDraft = {
+  opCode: '',
+  nameZh: '示例商业银行',
+  nameEn: 'Sample Commercial Bank',
+  instType: 'commercial',
+  address: '北京市西城区金融大街1号',
+  phone: '+86-10-88886666',
+  email: 'contact@samplebank.com',
+  currency: 'CNY',
+  walletNo: 'M-B-ICBC-CN-BJ-001',
+  walletName: '示例商业银行桥钱包',
+  userName: '张三',
+  country: 'CN',
+  region: 'BJ',
+  bankName: '中国工商银行',
+  bankAccount: '6222021001234567890',
+  bic: 'ICBKCNBJ',
+  lei: '549300EXAMPLE12345678',
+}

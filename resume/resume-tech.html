@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>毛喆 · 前端开发工程师</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      font-size: 9.45pt;
+      line-height: 1.5;
+      color: #1a2b42;
+      background: #fff;
+    }
+    .page {
+      display: grid;
+      grid-template-columns: 168px 1fr;
+      min-height: 297mm;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #0b1f3a 0%, #102a52 55%, #0d2244 100%);
+      color: #e8f0ff;
+      padding: 28px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+      background-size: 14px 14px;
+      pointer-events: none;
+    }
+    .sidebar > * { position: relative; z-index: 1; }
+    .name {
+      font-size: 22pt;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+    .role {
+      font-size: 9pt;
+      color: #7dd3fc;
+      font-weight: 600;
+      margin-bottom: 22px;
+      letter-spacing: 0.04em;
+    }
+    .side-block { margin-bottom: 20px; }
+    .side-label {
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #38bdf8;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .side-item {
+      font-size: 8.5pt;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+      word-break: break-all;
+    }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      font-size: 7pt;
+      padding: 3px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.08);
+      color: #bae6fd;
+    }
+    .main {
+      padding: 25px 28px 22px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .section { margin-bottom: 13px; }
+    .section-title {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #0f3d7a;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #2165d8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 14px;
+      background: linear-gradient(180deg, #38bdf8, #2165d8);
+      border-radius: 2px;
+    }
+    .intro { color: #334155; text-align: justify; }
+    .job { margin-bottom: 10px; }
+    .job-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .job-co { font-weight: 700; color: #0f172a; font-size: 10pt; }
+    .job-meta { font-size: 8.5pt; color: #64748b; white-space: nowrap; }
+    .job-title { font-size: 9pt; color: #2165d8; font-weight: 600; margin-bottom: 4px; }
+    ul { padding-left: 14px; color: #334155; }
+    li { margin-bottom: 2.5px; }
+    .project { margin-bottom: 9px; }
+    .project-name { font-weight: 700; color: #0f172a; font-size: 9.5pt; }
+    .project-meta { font-size: 8.5pt; color: #64748b; margin-bottom: 3px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+    th, td {
+      border: 1px solid #dbe7fa;
+      padding: 5px 7px;
+      text-align: left;
+    }
+    th { background: #f0f6ff; color: #1e4f9f; font-weight: 600; }
+    .skills-line { color: #334155; margin-bottom: 5px; }
+    .skills-line strong { color: #1e4f9f; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="name">毛喆</div>
+      <div class="role">前端开发工程师</div>
+
+      <div class="side-block">
+        <div class="side-label">Contact</div>
+        <div class="side-item">13409595757</div>
+        <div class="side-item">cnmz@msn.com</div>
+        <div class="side-item">深圳</div>
+      </div>
+
+      <div class="side-block">
+        <div class="side-label">Intent</div>
+        <div class="side-item">全职 · 前端开发</div>
+        <div class="side-item">22K–30K / 月</div>
+        <div class="side-item">在职</div>
+      </div>
+
+      <div class="side-block">
+        <div class="side-label">Stack</div>
+        <div class="tag-list">
+          <span class="tag">Vue3</span>
+          <span class="tag">TypeScript</span>
+          <span class="tag">Vite</span>
+          <span class="tag">Webpack</span>
+          <span class="tag">Java</span>
+          <span class="tag">Docker</span>
+          <span class="tag">FinTech</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="section">
+        <div class="section-title">个人简介</div>
+        <p class="intro">10+ 年前端开发经验，深耕金融科技、银行柜面、智能机具、信创改造领域。擅长 Vue2/Vue3 + TypeScript 架构搭建、低代码组件封装与多端适配（H5 / Pad / 手机）。兼具技术研发与项目管理能力，具备 OCBC 海外项目对接与全流程交付经验。</p>
+      </section>
+
+      <section class="section">
+        <div class="section-title">核心技能</div>
+        <p class="skills-line"><strong>前端</strong> Vue2/Vue3 · TS · ES6 · Vite · Webpack · 低代码组件 · 多端适配</p>
+        <p class="skills-line"><strong>工程化</strong> Java · MySQL/Oracle · MongoDB · Docker · Jenkins · Nginx · Linux</p>
+        <p class="skills-line"><strong>金融</strong> 柜面 · 机具 · 信创 · 硬件调用 · 报文 · 打印组件 · Web3 基础</p>
+      </section>
+
+      <section class="section">
+        <div class="section-title">工作经历</div>
+        <div class="job">
+          <div class="job-head"><span class="job-co">北京宇信科技集团</span><span class="job-meta">2022.11 – 至今</span></div>
+          <div class="job-title">Web 前端工程师 · 22K/月</div>
+          <ul>
+            <li>主导信贷、自助终端架构与性能调优，Pad / H5 全适配。</li>
+            <li>Vue3 + TS + Vite 搭建企业级框架，封装低代码组件与硬件/网络模块。</li>
+            <li>OCBC ATM 多币种存取；Swift 报文改造项目经理，跨团队交付上线。</li>
+          </ul>
+        </div>
+        <div class="job">
+          <div class="job-head"><span class="job-co">东方通信股份有限公司</span><span class="job-meta">2015.11 – 2022.11</span></div>
+          <div class="job-title">Web 前端工程师 · 16K/月</div>
+          <ul>
+            <li>WOSA 统一硬件 API，J2EE → Vue2，落地 ABOWA 4.0 平台。</li>
+            <li>内蒙农商行信创、泰隆超级柜台、重庆农商行 C 端等核心交易开发。</li>
+          </ul>
+        </div>
+        <div class="job">
+          <div class="job-head"><span class="job-co">上海映霸传媒 / 北京银丰新融</span><span class="job-meta">2013 – 2015</span></div>
+          <div class="job-title">Android / Java 开发</div>
+          <ul>
+            <li>IMBATV 直播客户端；SSI 反洗钱与审计系统开发。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">精选项目</div>
+        <div class="project">
+          <div class="project-name">泰隆银行信贷项目 · PAD 端</div>
+          <div class="project-meta">研发骨干 · 2024.05–2025.11 · Vue3 + TypeScript</div>
+          <ul>
+            <li>负责 PAD 端前端架构设计与核心模块开发，封装信贷业务通用组件库，支撑业务快速迭代。</li>
+            <li>独立完成手机端全流程开发，统一 PAD 与手机端业务流程、数据模型与交互规范，解决跨终端适配问题并保障上线质量。</li>
+          </ul>
+        </div>
+        <div class="project">
+          <div class="project-name">新加坡华侨银行自助现金柜员机</div>
+          <div class="project-meta">前端负责人 · 2022.11–2024.05 · Vue3 + TypeScript + Vite</div>
+          <ul>
+            <li>从零搭建项目框架，封装交易低代码组件、硬件调用、网络请求等公共模块，缩短开发周期。</li>
+            <li>支持新元、美元（含硬币）多币种现金存取，完成全流程前端设计、组件复用与上线交付，项目稳定运行。</li>
+          </ul>
+        </div>
+        <div class="project">
+          <div class="project-name">内蒙农村商业银行信创项目</div>
+          <div class="project-meta">前端核心开发 · 2020.04–2022.10</div>
+          <ul>
+            <li>适配信创环境，重构硬件交互逻辑，兼容 PISA 金融机具协议，编写 ABOWA 4.0 标准 API 文档。</li>
+            <li>主导 Code Review，沉淀开发规范并保障上线版本质量，提升团队整体开发效率。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">教育背景</div>
+        <table>
+          <tr><th>院校</th><th>学历</th><th>专业</th><th>时间</th></tr>
+          <tr><td>电子科技大学中山学院</td><td>本科</td><td>计算机科学与技术</td><td>2026–2028</td></tr>
+          <tr><td>宁夏大学</td><td>大专</td><td>室内设计</td><td>2006–2010</td></tr>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
