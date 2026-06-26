@@ -6,6 +6,7 @@ import './OpsConsole.css'
 import OpsOverview from './views/OpsOverview.jsx'
 import InstitutionView from './views/InstitutionView.jsx'
 import WhitelistView from './views/WhitelistView.jsx'
+import CrosschainView from './views/CrosschainView.jsx'
 import TransactionMonitorView from './views/TransactionMonitorView.jsx'
 import ClearingWindowView from './views/ClearingWindowView.jsx'
 import ExceptionView from './views/ExceptionView.jsx'
@@ -27,7 +28,7 @@ export default function OpsConsole({ theme, loginTimeText, onLogout, onGoHome })
     switch (activeNav) {
       case 'overview': return <OpsOverview onNavigate={setActiveNav} />
       case 'institution': return <InstitutionView />
-      case 'crosschain':
+      case 'crosschain': return <CrosschainView onBack={() => setActiveNav('overview')} />
       case 'monitor': return <TransactionMonitorView />
       case 'whitelist': return <WhitelistView />
       case 'clearing': return <ClearingWindowView />

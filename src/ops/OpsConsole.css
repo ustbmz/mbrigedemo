@@ -153,7 +153,7 @@
   min-height: 100vh;
 }
 
-.ops-view:not(.ops-overview):not(.ops-institution):not(.ops-whitelist):not(.ops-txn-monitor):not(.ops-exception) {
+.ops-view:not(.ops-overview):not(.ops-institution):not(.ops-whitelist):not(.ops-txn-monitor):not(.ops-exception):not(.ops-crosschain) {
   background: #fff;
   border-radius: 8px;
   padding: 20px 24px;
