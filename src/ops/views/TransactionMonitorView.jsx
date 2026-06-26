@@ -1,82 +1,268 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import OpsTable from '../components/OpsTable.jsx'
-import StatusBadge from '../components/StatusBadge.jsx'
-import { mockTransactions } from '../mock/data.js'
+import { mockTxnMonitorList } from '../mock/data.js'
+import TxnTrackModal from './TxnTrackModal.jsx'
+import './TransactionMonitorView.css'
+
+const TABS = ['supervise', 'clearing', 'queued']
+
+const EMPTY_FILTERS = {
+  txnNo: '',
+  txnId: '',
+  scene: 'all',
+  status: 'all',
+  startTime: '',
+  endTime: '',
+}
+
+function TabIconSupervise() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <path d="M6.5 1a.5.5 0 0 0-.5.5V3h-1A2.5 2.5 0 0 0 2.5 5.5v1A2.5 2.5 0 0 0 5 9h1v5.5a.5.5 0 0 0 1 0V9h1a2.5 2.5 0 0 0 2.5-2.5v-1A2.5 2.5 0 0 0 8 3H7V1.5a.5.5 0 0 0-.5-.5zM5 4h6a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 11 8H5a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 5 4z" />
+    </svg>
+  )
+}
+
+function TabIconClearing() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zm0 1a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm-.5 2v3.25L5.03 9.03l-.707.707L8 11.414l3.677-3.677-.707-.707L8.5 7.75V4.5h-1z" />
+    </svg>
+  )
+}
+
+function TabIconQueued() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <path d="M3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5v-11zM4.5 2.5v11h7v-11h-7zM5.5 5h5v1h-5V5zm0 2.5h3.5v1H5.5v-1z" />
+    </svg>
+  )
+}
+
+const TAB_ICONS = {
+  supervise: TabIconSupervise,
+  clearing: TabIconClearing,
+  queued: TabIconQueued,
+}
+
+function StatusCell({ status, label }) {
+  return <span className={`txn-status txn-status--${status}`}>{label}</span>
+}
 
 export default function TransactionMonitorView() {
   const { t } = useTranslation()
-  const [query, setQuery] = useState('')
-  const [sceneFilter, setSceneFilter] = useState('all')
-  const [selected, setSelected] = useState(null)
+  const [tab, setTab] = useState('supervise')
+  const [page, setPage] = useState(1)
+  const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [applied, setApplied] = useState(EMPTY_FILTERS)
+  const [trackRow, setTrackRow] = useState(null)
 
   const filtered = useMemo(() => {
-    return mockTransactions.filter((tx) => {
-      if (sceneFilter !== 'all' && tx.scene !== sceneFilter) return false
-      if (!query.trim()) return true
-      const q = query.toLowerCase()
-      return tx.id.toLowerCase().includes(q) || tx.msgId.toLowerCase().includes(q)
+    return mockTxnMonitorList.filter((row) => {
+      if (applied.scene !== 'all' && row.scene !== applied.scene) return false
+      if (applied.status !== 'all' && row.status !== applied.status) return false
+      if (applied.txnNo && !row.txnNo.toLowerCase().includes(applied.txnNo.toLowerCase())) return false
+      if (applied.txnId && !row.txnId.toLowerCase().includes(applied.txnId.toLowerCase())) return false
+      return true
     })
-  }, [query, sceneFilter])
+  }, [applied])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / 5))
+  const pageNumbers = Array.from({ length: Math.min(totalPages, 3) }, (_, i) => i + 1)
+
+  const handleReset = () => {
+    setFilters(EMPTY_FILTERS)
+    setApplied(EMPTY_FILTERS)
+    setPage(1)
+  }
+
+  const handleQuery = () => {
+    setApplied({ ...filters })
+    setPage(1)
+  }
 
   return (
-    <div className="ops-view">
-      <h2>{t('ops.monitor.title')}</h2>
-      <p className="ops-desc">{t('ops.monitor.desc')}</p>
+    <div className="ops-view ops-txn-monitor">
+      <header className="ops-txn-monitor-header">
+        <h2>{t('ops.monitor.title')}</h2>
+        <p className="ops-desc">{t('ops.monitor.desc')}</p>
+      </header>
 
-      <div className="ops-toolbar">
-        <input className="ops-search" placeholder={t('ops.monitor.search')} value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="ops-select" value={sceneFilter} onChange={(e) => setSceneFilter(e.target.value)}>
-          <option value="all">{t('ops.monitor.allScenes')}</option>
-          <option value="CNY_OUT">{t('ops.txn.scene_CNY_OUT')}</option>
-          <option value="FX_OUT">{t('ops.txn.scene_FX_OUT')}</option>
-          <option value="CNY_IN">{t('ops.txn.scene_CNY_IN')}</option>
-          <option value="FX_IN">{t('ops.txn.scene_FX_IN')}</option>
-        </select>
+      <div className="txn-tabs">
+        {TABS.map((id) => {
+          const Icon = TAB_ICONS[id]
+          return (
+            <button
+              key={id}
+              type="button"
+              className={`txn-tab ${tab === id ? 'active' : ''}`}
+              onClick={() => setTab(id)}
+            >
+              <Icon />
+              {t(`ops.monitor.tab_${id}`)}
+            </button>
+          )
+        })}
       </div>
 
-      <div className="ops-split">
-        <OpsTable
-          columns={[
-            { key: 'id', label: t('ops.col.txnId'), width: '1.3fr', mono: true },
-            { key: 'scene', label: t('ops.col.scene'), width: '0.9fr', render: (r) => t(`ops.txn.scene_${r.scene}`) },
-            { key: 'amount', label: t('ops.col.amount'), width: '1fr', render: (r) => `${r.currency} ${r.amount.toLocaleString()}` },
-            { key: 'status', label: t('ops.col.status'), width: '0.9fr', render: (r) => <StatusBadge status={r.status} label={t(`ops.txn.status_${r.status}`)} /> },
-          ]}
-          rows={filtered}
-          onRowClick={setSelected}
-          emptyText={t('ops.empty')}
-        />
+      {tab === 'supervise' ? (
+        <>
+          <section className="txn-filter-card">
+            <div className="txn-filter-row">
+              <div className="txn-field">
+                <label>{t('ops.monitor.filterTxnNo')}</label>
+                <input
+                  value={filters.txnNo}
+                  onChange={(e) => setFilters((f) => ({ ...f, txnNo: e.target.value }))}
+                  placeholder={t('ops.monitor.filterTxnNoPh')}
+                />
+              </div>
+              <div className="txn-field">
+                <label>{t('ops.monitor.filterTxnId')}</label>
+                <input
+                  value={filters.txnId}
+                  onChange={(e) => setFilters((f) => ({ ...f, txnId: e.target.value }))}
+                  placeholder={t('ops.monitor.filterTxnIdPh')}
+                />
+              </div>
+              <div className="txn-field">
+                <label>{t('ops.monitor.filterScene')}</label>
+                <select value={filters.scene} onChange={(e) => setFilters((f) => ({ ...f, scene: e.target.value }))}>
+                  <option value="all">{t('ops.monitor.filterAll')}</option>
+                  <option value="pvp">{t('ops.monitor.scene_pvp')}</option>
+                  <option value="cross_border">{t('ops.monitor.scene_cross_border')}</option>
+                  <option value="fx_swap">{t('ops.monitor.scene_fx_swap')}</option>
+                  <option value="internal">{t('ops.monitor.scene_internal')}</option>
+                </select>
+              </div>
+              <div className="txn-field">
+                <label>{t('ops.monitor.filterStatus')}</label>
+                <select value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}>
+                  <option value="all">{t('ops.monitor.filterAll')}</option>
+                  <option value="success">{t('ops.monitor.status_success')}</option>
+                  <option value="failed">{t('ops.monitor.status_failed')}</option>
+                  <option value="processing">{t('ops.monitor.status_processing')}</option>
+                  <option value="queued">{t('ops.monitor.status_queued')}</option>
+                  <option value="rejected">{t('ops.monitor.status_rejected')}</option>
+                </select>
+              </div>
+              <div className="txn-field">
+                <label>{t('ops.monitor.filterStartTime')}</label>
+                <input
+                  type="datetime-local"
+                  value={filters.startTime}
+                  onChange={(e) => setFilters((f) => ({ ...f, startTime: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="txn-filter-row txn-filter-row--actions">
+              <div className="txn-field">
+                <label>{t('ops.monitor.filterEndTime')}</label>
+                <input
+                  type="datetime-local"
+                  value={filters.endTime}
+                  onChange={(e) => setFilters((f) => ({ ...f, endTime: e.target.value }))}
+                />
+              </div>
+              <div />
+              <div className="txn-filter-actions">
+                <button type="button" className="txn-btn-reset" onClick={handleReset}>
+                  {t('ops.monitor.reset')}
+                </button>
+                <button type="button" className="txn-btn-query" onClick={handleQuery}>
+                  {t('ops.monitor.query')}
+                </button>
+              </div>
+            </div>
+          </section>
 
-        {selected ? (
-          <aside className="ops-detail">
-            <h3>{t('ops.monitor.detailTitle')}</h3>
-            <dl className="ops-dl">
-              <dt>{t('ops.col.txnId')}</dt><dd className="mono">{selected.id}</dd>
-              <dt>{t('ops.col.msgId')}</dt><dd className="mono">{selected.msgId}</dd>
-              <dt>{t('ops.col.scene')}</dt><dd>{t(`ops.txn.scene_${selected.scene}`)}</dd>
-              <dt>{t('ops.col.amount')}</dt><dd>{selected.currency} {selected.amount.toLocaleString()}</dd>
-              <dt>{t('ops.col.payer')}</dt><dd>{selected.payer}</dd>
-              <dt>{t('ops.col.receiver')}</dt><dd>{selected.receiver}</dd>
-              {selected.errorCode ? (
-                <>
-                  <dt>{t('ops.col.errorCode')}</dt><dd className="mono">{selected.errorCode}</dd>
-                  <dt>{t('ops.col.errorReason')}</dt><dd>{selected.errorReason}</dd>
-                </>
-              ) : null}
-            </dl>
-            <h4>{t('ops.monitor.timeline')}</h4>
-            <ol className="ops-timeline">
-              {selected.timeline.map((node) => (
-                <li key={node.step} className={`ops-timeline-item ops-timeline-${node.status}`}>
-                  <strong>{t(`ops.monitor.step_${node.step}`)}</strong>
-                  <span>{node.at || t('ops.monitor.pending')}</span>
-                </li>
+          <section className="txn-table-card">
+            <table className="txn-table">
+              <thead>
+                <tr>
+                  <th>{t('ops.monitor.colSeq')}</th>
+                  <th>{t('ops.monitor.filterTxnNo')}</th>
+                  <th>{t('ops.monitor.filterTxnId')}</th>
+                  <th>{t('ops.monitor.filterScene')}</th>
+                  <th>{t('ops.monitor.filterStatus')}</th>
+                  <th>{t('ops.monitor.colTxnTime')}</th>
+                  <th>{t('ops.monitor.colException')}</th>
+                  <th>{t('ops.monitor.colAction')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((row) => (
+                  <tr key={row.id}>
+                    <td>{row.seq}</td>
+                    <td>{row.txnNo}</td>
+                    <td>{row.txnId}</td>
+                    <td>{t(`ops.monitor.scene_${row.scene}`)}</td>
+                    <td>
+                      <StatusCell
+                        status={row.status}
+                        label={t(`ops.monitor.status_${row.status}`)}
+                      />
+                    </td>
+                    <td>{row.txnTime}</td>
+                    <td>
+                      {row.exceptionReason ? (
+                        row.exceptionReason
+                      ) : (
+                        <span className="txn-reason-empty">-</span>
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="txn-btn-track"
+                        onClick={() => setTrackRow(row)}
+                      >
+                        {t('ops.monitor.track')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="txn-pagination">
+              <button
+                type="button"
+                className="txn-page-btn"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                {t('ops.monitor.prevPage')}
+              </button>
+              {pageNumbers.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={`txn-page-num ${page === n ? 'active' : ''}`}
+                  onClick={() => setPage(n)}
+                >
+                  {n}
+                </button>
               ))}
-            </ol>
-          </aside>
-        ) : null}
-      </div>
+              <button
+                type="button"
+                className="txn-page-btn"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                {t('ops.monitor.nextPage')}
+              </button>
+              <span className="txn-page-total">
+                {t('ops.monitor.totalRecords', { count: filtered.length })}
+              </span>
+            </div>
+          </section>
+        </>
+      ) : (
+        <div className="txn-placeholder">{t('ops.monitor.tabPlaceholder')}</div>
+      )}
+
+      {trackRow && <TxnTrackModal row={trackRow} onClose={() => setTrackRow(null)} />}
     </div>
   )
 }

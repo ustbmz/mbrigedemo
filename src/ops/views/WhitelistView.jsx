@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { mockWhitelist } from '../mock/data.js'
+import WhitelistAddForm from './WhitelistAddForm.jsx'
 import './WhitelistView.css'
 
 const TABS = ['query', 'add']
@@ -86,10 +87,22 @@ export default function WhitelistView() {
 
   return (
     <div className="ops-view ops-whitelist">
-      <header className="ops-whitelist-header">
-        <h2>{t('ops.whitelist.title')}</h2>
-        <p className="ops-desc">{t('ops.whitelist.desc')}</p>
-      </header>
+      {tab === 'add' ? (
+        <>
+          <button type="button" className="wl-back-link" onClick={() => setTab('query')}>
+            ← {t('ops.whitelist.add.backToList')}
+          </button>
+          <header className="ops-whitelist-header">
+            <h2>{t('ops.whitelist.add.pageTitle')}</h2>
+            <p className="ops-desc">{t('ops.whitelist.add.pageDesc')}</p>
+          </header>
+        </>
+      ) : (
+        <header className="ops-whitelist-header">
+          <h2>{t('ops.whitelist.title')}</h2>
+          <p className="ops-desc">{t('ops.whitelist.desc')}</p>
+        </header>
+      )}
 
       <div className="wl-tabs">
         {TABS.map((id) => {
@@ -277,7 +290,7 @@ export default function WhitelistView() {
           </section>
         </>
       ) : (
-        <div className="wl-placeholder">{t('ops.whitelist.addMock')}</div>
+        <WhitelistAddForm />
       )}
     </div>
   )

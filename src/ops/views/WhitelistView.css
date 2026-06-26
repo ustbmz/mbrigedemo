@@ -371,6 +371,184 @@
   font-size: 14px;
 }
 
+/* 新增白名单 */
+.wl-back-link {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--wl-primary);
+  cursor: pointer;
+  line-height: 22px;
+}
+
+.wl-back-link:hover {
+  color: #4096ff;
+}
+
+.wl-tip-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: var(--wl-radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.wl-tip-icon {
+  font-size: 16px;
+  line-height: 22px;
+  flex-shrink: 0;
+}
+
+.wl-tip-banner p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--wl-text);
+  line-height: 22px;
+}
+
+.wl-form-section {
+  background: var(--wl-card);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.wl-form-section-title {
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--wl-border);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--wl-text);
+  line-height: 24px;
+}
+
+.wl-form-grid {
+  display: grid;
+  gap: 16px 24px;
+}
+
+.wl-form-grid--1 {
+  grid-template-columns: 1fr;
+}
+
+.wl-form-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.wl-form-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--wl-text);
+  line-height: 22px;
+}
+
+.wl-required {
+  color: var(--wl-error);
+  margin-left: 2px;
+}
+
+.wl-form-field input,
+.wl-form-field select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 0 11px;
+  font-size: 14px;
+  color: var(--wl-text);
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.wl-form-field input::placeholder {
+  color: #bfbfbf;
+}
+
+.wl-form-field input:focus,
+.wl-form-field select:focus {
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+.wl-field-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--wl-text-secondary);
+  line-height: 20px;
+}
+
+.wl-form-field--span2 {
+  grid-column: span 2;
+}
+
+.wl-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 0 24px;
+}
+
+.wl-btn-draft {
+  height: 32px;
+  padding: 0 15px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--wl-text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.wl-btn-draft:hover {
+  color: var(--wl-primary);
+  border-color: var(--wl-primary);
+}
+
+.wl-btn-form-reset {
+  height: 32px;
+  padding: 0 15px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: var(--wl-text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.wl-btn-form-reset:hover {
+  color: var(--wl-primary);
+  border-color: var(--wl-primary);
+  background: #fff;
+}
+
+.wl-btn-submit {
+  height: 32px;
+  padding: 0 15px;
+  border: none;
+  border-radius: 6px;
+  background: var(--wl-primary);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+}
+
+.wl-btn-submit:hover {
+  background: #4096ff;
+}
+
 @media (max-width: 1100px) {
   .wl-filter-row {
     grid-template-columns: repeat(2, 1fr);
@@ -382,6 +560,14 @@
 
   .wl-filter-actions {
     grid-column: span 2;
+  }
+
+  .wl-form-grid--2 {
+    grid-template-columns: 1fr;
+  }
+
+  .wl-form-field--span2 {
+    grid-column: span 1;
   }
 }
 
