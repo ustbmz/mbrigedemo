@@ -295,7 +295,7 @@
       "backHome": "Back to home",
       "tab_cnyOut": "CNY remittance",
       "tab_fxOut": "FX remittance",
-      "tab_fxSwap": "FX exchange",
+      "tab_fxRecords": "FX records",
       "tabPlaceholder": "This module is under development.",
       "cnyOut": {
         "tip": "Please fill in payer, payee, and transaction details accurately. Fields marked * are required. Verify SWIFT Code and payee address before submitting.",
@@ -371,6 +371,24 @@
         "submit": "Submit transaction",
         "saveDraftMock": "(Mock) Draft saved",
         "submitMock": "(Mock) CNY remittance submitted"
+      },
+      "fxOut": {
+        "tip": "Please fill in payer, payee, and FX remittance details accurately. Fields marked * are required. Verify SWIFT Code and remittance currency before submitting.",
+        "nameOrAccountHint": "Choose one: name or account",
+        "payerAddress": "Payer address",
+        "payerAddressPh": "Enter payer address",
+        "payeeAddressShort": "Payee address",
+        "payeeAddressShortPh": "Enter payee address",
+        "payeeSwiftHint": "Enter 8 or 11 character SWIFT Code",
+        "remitCurrency": "Remittance currency",
+        "remitDate": "Expected remittance date",
+        "fee_CRED": "Borne by beneficiary",
+        "amountCalc": "Amount calculator",
+        "amountCalcMock": "(Mock) Amount calculator demo",
+        "country_US": "United States",
+        "country_GB": "United Kingdom",
+        "saveDraftMock": "(Mock) FX remittance draft saved",
+        "submitMock": "(Mock) FX remittance submitted"
       }
     },
     "overview": {

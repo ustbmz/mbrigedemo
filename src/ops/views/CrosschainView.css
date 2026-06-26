@@ -253,6 +253,50 @@
   border-color: var(--xc-primary);
 }
 
+.xc-input-addon {
+  display: flex;
+  align-items: stretch;
+}
+
+.xc-input-addon input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.xc-input-addon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  background: #fafafa;
+  color: var(--xc-text-secondary);
+  font-size: 14px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.xc-input-addon-btn:hover {
+  color: var(--xc-primary);
+  border-color: var(--xc-primary);
+}
+
+.xc-input-addon:focus-within input {
+  border-color: var(--xc-primary);
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+.xc-input-addon:focus-within .xc-input-addon-btn {
+  border-color: var(--xc-primary);
+}
+
 .xc-form-footer {
   display: flex;
   justify-content: flex-end;

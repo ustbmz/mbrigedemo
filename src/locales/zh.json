@@ -295,7 +295,7 @@
       "backHome": "返回首页",
       "tab_cnyOut": "人民币汇出",
       "tab_fxOut": "外币汇出",
-      "tab_fxSwap": "外币兑换",
+      "tab_fxRecords": "外币记录",
       "tabPlaceholder": "该功能模块开发中，敬请期待。",
       "cnyOut": {
         "tip": "请准确填写付款人、收款人及交易信息，带 * 号为必填项。提交前请核对 SWIFT Code 与收款人地址。",
@@ -371,6 +371,24 @@
         "submit": "提交交易",
         "saveDraftMock": "（Mock）草稿已保存",
         "submitMock": "（Mock）人民币汇出交易已提交"
+      },
+      "fxOut": {
+        "tip": "请准确填写付款人、收款人及外币汇出信息，带 * 号为必填项。提交前请核对 SWIFT Code 与汇出币种。",
+        "nameOrAccountHint": "与账号二选一",
+        "payerAddress": "付款人地址",
+        "payerAddressPh": "请输入付款人地址",
+        "payeeAddressShort": "收款人地址",
+        "payeeAddressShortPh": "请输入收款人地址",
+        "payeeSwiftHint": "请输入 8 位或 11 位 SWIFT Code",
+        "remitCurrency": "汇出币种",
+        "remitDate": "预计汇出日期",
+        "fee_CRED": "受予方承担",
+        "amountCalc": "金额换算",
+        "amountCalcMock": "（Mock）金额换算工具演示",
+        "country_US": "美国",
+        "country_GB": "英国",
+        "saveDraftMock": "（Mock）外币汇出草稿已保存",
+        "submitMock": "（Mock）外币汇出交易已提交"
       }
     },
     "overview": {
